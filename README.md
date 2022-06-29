@@ -1,3 +1,5 @@
+![Screenshot](https://raw.githubusercontent.com/schnautzr/monster2.bas/master/Screenshot.png)
+
 IMPORTANT!!! Before first run, ensure that "Run > Output EXE to Source Folder" is selected. Otherwise you'll get a "File not found" error when you run.
 
 MONSTER2.BAS - the main file, for QB64.
