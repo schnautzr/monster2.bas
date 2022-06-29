@@ -1,0 +1,3223 @@
+'HIGH SCORES
+'DAVID M. AHL   7562
+'5447
+
+
+SCREEN _NEWIMAGE(640, 480, 32)
+DIM colors(16) AS LONG
+colors(0) = &HFF000000
+colors(1) = &HFF0000AA
+colors(2) = &HFF00AA00
+colors(3) = &HFF00AAAA
+colors(4) = &HFFAA0000
+colors(5) = &HFFAA00AA
+colors(6) = &HFFAA5500
+colors(7) = &HFFAAAAAA
+colors(8) = &HFF5A5A5A
+colors(9) = &HFF5555FF
+colors(10) = &HFF55FF55
+colors(11) = &HFF55FFFF
+colors(12) = &HFFFF5555
+colors(13) = &HFFFF55FF
+colors(14) = &HFFFFFF55
+colors(15) = &HFFFFFFFF
+1 CLS
+_CONTROLCHR OFF
+
+i = _LOADIMAGE("C:\Users\Rob\QBASIC\MONSTER\CASTLE.BMP", 32)
+
+
+_PUTIMAGE (40, 80), i
+
+RANDOMIZE TIMER
+REM "GIANT MONSTER ATTACK"
+REM BY LEE j. CHAPEL 5/1/1980
+REM ADAPTED FOR QBASIC AND MADE EVEN BETTER BY ROB SCHNAUTZ
+PRINT "*** MONSTER COMBAT"
+
+
+'tracker values
+TREE = 0
+EASY = 0
+MEDIUM = 1
+ENTERING_INN = 1
+NOTHING_THERE = 1
+PATH = 1
+HARD = 2
+WALL = 2
+HAVE_RANDOM_EVENT = 2
+CHECKING_MAP = 2
+DEADLY = 3
+NOISY_BATTLE = 3
+SLEEP_SUCCESS = 3
+INN = 3
+PIT = 4
+UNABLE_TO_MASTER_SPELL = 5
+SLEEP_SPELL = 6
+CHARM_SPELL = 7
+CASTLE = 7
+INVISIBILITY_SPELL = 8
+ENTERING_CASTLE = 9
+GIANT_BAT = 12
+FALL_IN_PIT = 13
+PRIZE_IS_SPELL = 14
+GIANT_EAGLE = 14
+NO_GUARDIAN = 100
+
+TYPE Abilities
+    str AS _BYTE
+    dex AS _BYTE
+    con AS _BYTE
+    int AS _BYTE
+    wis AS _BYTE
+    cha AS _BYTE
+END TYPE
+
+TYPE Dice
+    sides AS _BYTE
+    quantity AS INTEGER
+END TYPE
+
+
+TYPE Currency
+    cp AS INTEGER
+    sp AS INTEGER
+    ep AS INTEGER
+    gp AS INTEGER
+    pp AS INTEGER
+END TYPE
+
+TYPE Coordinates
+    x AS INTEGER
+    y AS INTEGER
+END TYPE
+
+TYPE Castle
+    coords AS Coordinates
+END TYPE
+
+TYPE Entity
+    id AS INTEGER
+    name AS STRING
+    plural AS STRING
+    cr AS SINGLE
+    color AS _BYTE
+    disallowBribe AS _BYTE
+    disallowSleep AS _BYTE
+    disallowCharm AS _BYTE
+    disallowInvisibility AS _BYTE
+    abilities AS Abilities
+    ac AS _BYTE
+    hitDice AS Dice
+    coins AS Currency
+    treasure AS Currency
+    xp AS LONG
+    coords AS Coordinates
+END TYPE
+
+TYPE Treasure
+    name AS STRING
+    color AS _BYTE
+    value AS Currency
+END TYPE
+
+TYPE ArtObject
+    name AS STRING
+    value AS Currency
+END TYPE
+
+TYPE MagicItem
+    name AS STRING
+END TYPE
+
+DATA 10,10,10,10,10,10
+DATA 1,8
+DATA 10
+DATA 1,10
+monsterCount = 1000
+
+DATA a treasure chest,200,6
+DATA a sword with might be enchanted,25,7
+specialTreasureCount = 2
+treasureCount = specialTreasureCount
+
+DATA an azurite stone,10,1
+DATA a banded agate stone,10,6
+DATA a blue quartz crystal,10,9
+DATA an eye agate stone,10,7
+DATA a hematite stone,10,8
+DATA a lapis lazuli stone,10,1
+DATA a malachite stone,10,2
+DATA a moss agate stone,10,12
+DATA an obsidian stone,10,8
+DATA a rhodochrosite stone,10,12
+DATA a tiger eye stone,10,6
+DATA a turquoise stone,10,11
+ornamentalStones = treasureCount
+oCount = 12
+treasureCount = treasureCount + oCount
+
+DATA ivory jewelry,100,7
+DATA wrought silver jewelry,100,7
+DATA wrought silver and gold jewelry,200,14
+DATA wrought gold jewelry,300,14
+DATA jade jewelry,500,10
+DATA coral jewelry,500,4
+DATA wrought platinum jewelry,500,7
+DATA silver jewelry with gems,1000,7
+DATA gold jewelry with gems,2000,14
+DATA platinum jewelry with gems,2000,7
+jewelry = treasureCount
+jCount = 10
+treasureCount = treasureCount + jCount
+
+DATA a silver ewer,25,7
+DATA a carved bone statuette,25,7
+DATA a small gold bracelet,25,14
+DATA a cloth-of-gold vestments,25,14
+DATA a silver-threaded black velvet mask,25,8
+DATA a copper chalice with silver filigree,25,6
+DATA a pair of engraved bone dice,25,7
+DATA a small framed mirror,25,7
+DATA an embroidered silk handkerchief,25,7
+DATA a gold locket holding a painted portrait,25,14
+art25 = treasureCount
+art25Count = 10
+treasureCount = treasureCount + art25Count
+
+DATA a gold ring set with bloodstones,250,14
+DATA a carved ivory statuette,250,7
+DATA a large gold bracelet,250,14
+DATA a silver necklace with gemstone pendant,250,7
+DATA a bronze crown,250,6
+DATA a silk robe with gold embroidery,250,5
+DATA a large well-made tapestry,250,2
+DATA a brass mug with jade inlay,250,14
+DATA a box of turquoise animal figurines,250,11
+DATA a gold bird cage with electrum filigree,250,14
+art250 = treasureCount
+art250Count = 10
+treasureCount = treasureCount + art250Count
+
+DATA a silver chalice set with moonstones,750,7
+DATA a silver-plated steel longsword,750,7
+DATA an exotic harp,750,6
+DATA a small gold idol,750,14
+DATA a gold and ruby dragon comb,750,14
+DATA a gold-embossed cork with amethysts,750,13
+DATA a ceremonial electrum dagger,750,9
+DATA a silver and gold brooch,750,14
+DATA an obsidian statuette,750,8
+DATA a painted gold war mark,750,14
+art750 = treasureCount
+art750Count = 10
+treasureCount = treasureCount + art750Count
+
+DATA a fine gold chain set with a fire opal,2500,4
+DATA an old masterpiece painting,2500,9
+DATA an embroidered silk and velvet mantle,2500,5
+DATA a platinum bracelet set with a sapphire,2500,1
+DATA an embroidered glove set with jewels,2500,7
+DATA a jeweled anklet,2500,13
+DATA a gold music box,2500,14
+DATA a gold circlet set with four aquamarines,2500,11
+DATA an eye patch with sapphire and moonstone,2500,1
+DATA a necklace string of small pink pearls,2500,13
+art2500 = treasureCount
+art2500Count = 10
+treasureCount = treasureCount + art2500Count
+
+DATA a jeweled gold crown,7500,14
+DATA a jeweled platinum ring,7500,7
+DATA a small gold statuette set with rubies,7500,4
+DATA a gold cup set with emeralds,7500,2
+DATA a gold and platinumjewelry box,7500,14
+DATA "a painted gold child's sarcophagus",7500,14
+DATA a jade game board with gold markers,7500,10
+DATA a bejeweled ivory drinking horn,7500,7
+art7500 = treasureCount
+art7500Count = 8
+treasureCount = treasureCount + art7500Count
+
+DATA sleep spell,5
+DATA charm,11
+DATA invisibility spell,1
+itemCount = 3
+
+DIM world(100, 100), items$(3), numbers(monsterCount), itemColor(itemCount)
+DIM quantity(monsterCount), die(monsterCount), hitDie(monsterCount), numHitDice(monsterCount)
+DIM player AS Entity
+READ player.abilities.str, player.abilities.dex, player.abilities.con, player.abilities.int, player.abilities.wis, player.abilities.cha
+READ player.hitDice.quantity, player.hitDice.sides
+
+file = 1
+i = 0
+OPEN "C:\Users\Rob\QBASIC\MONSTER\MONSTERS.CSV" FOR INPUT AS #file
+DIM monster(1000) AS Entity
+DIM castle(15) AS Castle
+DIM currentMonster AS Entity
+DIM mimic AS Entity
+DIM giantEagle AS Entity
+DIM giantBat AS Entity
+DIM pit AS Entity
+DIM basilisk AS Entity
+
+pit.name = "pit"
+pit.color = 6
+
+DO UNTIL EOF(file)
+    i = i + 1
+    monster(i).id = i
+    INPUT #file, monster(i).name
+    INPUT #file, monster(i).plural
+    INPUT #file, monster(i).cr
+    INPUT #file, monster(i).color
+    INPUT #file, x
+    monster(i).disallowBribe = x / 1000 MOD 2
+    monster(i).disallowSleep = x / 100 MOD 2
+    monster(i).disallowCharm = x / 10 MOD 2
+    monster(i).disallowInvisibility = x MOD 2
+    SELECT CASE monster(i).name
+        CASE "mimic"
+            mimic = monster(i)
+        CASE "giant eagle"
+            giantEagle = monster(i)
+        CASE "giant bat"
+            giantBat = monster(i)
+        CASE "basilisk"
+            basilisk = monster(i)
+    END SELECT
+LOOP
+monsterCount = i
+CLOSE
+file = file + 1
+OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM10.CSV" FOR INPUT AS #file
+DIM gemstone(100) AS Treasure
+i = 0
+gem10Offset = 1
+DO UNTIL EOF(file)
+    i = i + 1
+    INPUT #file, gemstone(i).name, gemstone(i).color
+    gemstone(i).value.gp = 10
+LOOP
+gem10Ct = i
+CLOSE
+file = file + 1
+OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM50.CSV" FOR INPUT AS #file
+gem50Offset = i + 1
+DO UNTIL EOF(file)
+    i = i + 1
+    INPUT #file, gemstone(i).name, gemstone(i).color
+    gemstone(i).value.gp = 50
+LOOP
+gem50Ct = i - gem50Offset + 1
+CLOSE
+file = file + 1
+OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM100.CSV" FOR INPUT AS #file
+gem100Offset = i + 1
+DO UNTIL EOF(file)
+    i = i + 1
+    INPUT #file, gemstone(i).name, gemstone(i).color
+    gemstone(i).value.gp = 100
+LOOP
+gem100Ct = i - gem100Offset + 1
+CLOSE
+file = file + 1
+OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM500.CSV" FOR INPUT AS #file
+gem500Offset = i + 1
+DO UNTIL EOF(file)
+    i = i + 1
+    INPUT #file, gemstone(i).name, gemstone(i).color
+    gemstone(i).value.gp = 500
+LOOP
+gem500Ct = i - gem500Offset + 1
+CLOSE
+file = file + 1
+OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM1000.CSV" FOR INPUT AS #file
+gem1000Offset = i + 1
+DO UNTIL EOF(file)
+    i = i + 1
+    INPUT #file, gemstone(i).name, gemstone(i).color
+    gemstone(i).value.gp = 1000
+LOOP
+gem1000Ct = i - gem1000Offset + 1
+gemCt = i
+CLOSE
+
+READ armorClass(0)
+READ numHitDice(0), hitDie(0)
+DIM treasure(1000) AS Treasure
+FOR i = 1 TO treasureCount
+    READ treasure(i).name, treasure(i).value.gp, treasure(i).color
+NEXT
+gemOffset = treasureCount + 1
+FOR i = 1 TO gemCt
+    treasure(gemOffset + i - 1) = gemstone(i)
+NEXT
+treasureCount = treasureCount + gemCt
+FOR i = 1 TO itemCount
+    READ items$(i), itemColor(i)
+NEXT
+
+FOR i = 1 TO treasureCount
+    IF treasure(i).value.gp = 0 THEN PRINT "WARNING: Treasure #"; i; "is glitched."
+NEXT
+invisibilityRemaining = rollD(1, 3) - 1
+combatStrengthRemaining = rollD(1, 1501) + 499 '10
+sleepRemaining = rollD(1, 6) - 1
+charmsRemaining = rollD(1, 4) - 1
+PRINT
+INPUT "Do you wish to use the strength and magic from a previous game"; X$
+IF UCASE$(X$) = "Y" THEN
+    DO
+        INPUT "COMBAT STRENGTH"; c
+    LOOP WHILE c < 500 OR c > 2000
+    INPUT "SLEEP SPELLS"; sleepRemaining
+    INPUT "CHARMS:"; charmsRemaining
+    INPUT "INVISIBILITY"; invisibilityRemaining
+    INPUT "PREVIOUS LARGEST TREASURE TOTAL"; treasurePointsPrev
+END IF
+
+INITIALIZE:
+DO
+    maxCombatStrength = combatStrengthRemaining
+    invisibilityMax = invisibilityRemaining
+    sleepMax = sleepRemaining
+    charmsMax = charmsRemaining
+
+    castlesLeft = 0
+    event = 0
+    num2 = 0
+    t = 0
+    points = 0
+
+    FOR i = 0 TO 99
+        FOR j = 0 TO 99
+            world(i, j) = 0
+        NEXT
+    NEXT
+
+    REM castles
+    FOR i = 1 TO rollD(1, 7) + 6
+        player.coords.x = rollD(1, 100)
+        player.coords.y = rollD(1, 100)
+
+        IF world(player.coords.x, player.coords.y) < 7 THEN
+            world(player.coords.x, player.coords.y) = 7
+            castle(i).coords = player.coords
+            castlesLeft = castlesLeft + 1
+        ELSE
+            i = i - 1
+        END IF
+    NEXT
+    'i=the number of castles left
+    REM inns
+    FOR i = 1 TO rollD(1, 100) + 100
+        player.coords.x = rollD(1, 100)
+        player.coords.y = rollD(1, 100)
+
+        IF world(player.coords.x, player.coords.y) < 3 THEN world(player.coords.x, player.coords.y) = 3
+    NEXT
+    'i=the number of inns
+    REM walls
+    FOR i = 1 TO rollD(1, 500) + 500
+        player.coords.x = rollD(1, 100)
+        player.coords.y = rollD(1, 100)
+
+        IF world(player.coords.x, player.coords.y) < 2 THEN world(player.coords.x, player.coords.y) = 2
+    NEXT
+    'i=the number of walls
+    REM paths
+    FOR i = 1 TO INT(RND(1) * 5000 + 5000)
+        player.coords.x = rollD(1, 100)
+        player.coords.y = rollD(1, 100)
+
+        IF world(player.coords.x, player.coords.y) < 1 THEN world(player.coords.x, player.coords.y) = 1
+    NEXT
+    'i=the number of paths
+    RANDOM_LOC:
+    DO
+        player.coords.x = rollD(1, 80) + 10
+        player.coords.y = rollD(1, 80) + 10
+    LOOP WHILE world(player.coords.x, player.coords.y) > 1
+
+    DO UNTIL player.coords.x < 1 OR player.coords.x > 100 OR player.coords.y < 1 OR player.coords.y > 100
+        'FOR i = 0 TO 99
+        'FOR j = 0 TO 99
+        'world(i, j) = 0
+        'NEXT
+        'NEXT
+        'i=10, j=10
+        CHECK_MAP:
+        exitForest = 0
+        CLS
+        PRINT
+        FOR i = (player.coords.y - 5) TO (player.coords.y + 5)
+            FOR j = (player.coords.x - 5) TO (player.coords.x + 5)
+                IF j = player.coords.x - 5 THEN PRINT TAB(3);
+                IF i = player.coords.y AND j = player.coords.x THEN
+                    COLOR colors(14)
+                    PRINT "";
+
+                ELSE
+                    IF i < 1 OR j < 1 OR i > 100 OR j > 100 THEN
+                        COLOR colors(2), colors(12)
+                        PRINT "±";
+                    ELSE
+                        SELECT CASE world(j, i)
+                            CASE 0
+                                COLOR colors(2), colors(6)
+                                PRINT "";
+                            CASE 1
+                                COLOR colors(0), colors(6)
+                                PRINT " ";
+                            CASE 2
+                                COLOR colors(8), colors(6)
+                                PRINT "Î";
+                            CASE 3
+                                COLOR colors(0), colors(6)
+                                PRINT "";
+                            CASE 4
+                                COLOR colors(0), colors(6)
+                                PRINT "";
+                            CASE 7
+                                COLOR colors(3), colors(6)
+                                PRINT "ê";
+                        END SELECT
+                    END IF
+                END IF
+            NEXT
+            COLOR colors(15), colors(0)
+            PRINT TAB(18);
+            SELECT CASE i
+                CASE player.coords.y - 4
+                    PRINT "Combat Strength-";
+                    PRINT TAB(40); combatStrengthRemaining
+                CASE player.coords.y - 3
+                    PRINT "Experience Points-";
+                    PRINT TAB(40); player.xp
+                CASE player.coords.y - 2
+                    PRINT "Treasure Total-";
+                    PRINT TAB(40); player.treasure.gp
+                CASE player.coords.y - 1
+                    PRINT "Money-";
+                    COLOR colors(6)
+                    PRINT TAB(40); "þ"; player.coins.cp;
+                    COLOR colors(7)
+                    PRINT ""; player.coins.sp;
+                    COLOR colors(9)
+                    PRINT ""; player.coins.ep;
+                    COLOR colors(14)
+                    PRINT "è"; player.coins.gp;
+                    COLOR colors(7)
+                    PRINT ""; player.coins.pp
+                CASE player.coords.y + 1
+                    PRINT "Magic:"
+                CASE player.coords.y + 2
+                    PRINT " Sleep Spells-";
+                    PRINT TAB(40); sleepRemaining
+                CASE player.coords.y + 3
+                    PRINT " Charms-";
+                    PRINT TAB(40); charmsRemaining
+                CASE player.coords.y + 4
+                    PRINT " Invisibility-";
+                    PRINT TAB(40); invisibilityRemaining
+                CASE player.coords.y + 5
+                    PRINT "Days in the Forest-";
+                    PRINT TAB(40); daysInForest
+                CASE ELSE
+                    PRINT
+            END SELECT
+        NEXT
+        PRINT
+        'i,j is 5 east and 5 south of person
+
+        SELECT CASE tracker:
+            CASE ENTERING_INN
+                RETURN
+            CASE IS <> CHECKING_MAP
+                WHAT_HAPPENS_HERE:
+                event = rollD(1, 10) - 1
+                IF event = HAVE_RANDOM_EVENT THEN
+                    event = INT(RND(1) * 11 + 1)
+                    SELECT CASE event
+                        CASE 1
+                            PRINT "You stepped into a time warp and lost 7 days."
+                            daysInForest = daysInForest + 7
+
+                        CASE 2
+                            IF combatStrengthRemaining >= maxCombatStrength THEN EXIT SELECT
+                            PRINT "You met an elf who gave you a magic drink that gave your Combat Strength back."
+                            combatStrengthRemaining = maxCombatStrength
+
+                        CASE 3
+                            num = INT(RND(1) * 10 + 1)
+                            num2 = daysInForest
+                            daysInForest = daysInForest - num
+                            IF daysInForest < .1 THEN
+                                daysInForest = .1
+                                num = num2 - daysInForest
+                            END IF
+                            PRINT "You stepped into a time warp and gained"; num; "days."
+
+                        CASE 4
+                            IF invisibilityRemaining + charmsRemaining + sleepRemaining = invisibilityMax + charmsMax + sleepMax THEN EXIT SELECT
+                            PRINT "You ran into a wizard who gave you a potion that restored all your magic."
+                            invisibilityRemaining = invisibilityMax
+                            charmsRemaining = charmsMax
+                            sleepRemaining = sleepMax
+
+                        CASE 5
+                            IF player.treasure.gp < 2 THEN EXIT SELECT
+                            PRINT "You fell into some quicksand. You lost half of your"
+                            PRINT "treasure."
+                            player.treasure.gp = INT(player.treasure.gp / 2)
+
+                        CASE 6
+                            PRINT "You ran into some thick underbrush and used up half"
+                            PRINT "your strength."
+                            combatStrengthRemaining = INT(combatStrengthRemaining / 2)
+                            PRINT "Your Combat Strength is now "; combatStrengthRemaining
+
+                        CASE 7
+                            num = INT(RND(1) * 50 + 1)
+                            PRINT "You found"; num;
+                            SELECT CASE rollD(1, 1131)
+                                CASE 1 TO 1000
+                                    COLOR colors(6)
+                                    PRINT "copper";
+                                    player.coins.cp = player.coins.cp + num
+                                CASE 1001 TO 1100
+                                    COLOR colors(7)
+                                    PRINT "silver";
+                                    player.coins.sp = player.coins.sp + num
+                                CASE 1101 TO 1120
+                                    COLOR colors(9)
+                                    PRINT "electrum";
+                                    player.coins.ep = player.coins.ep + num
+                                CASE 1120 TO 1130
+                                    COLOR colors(14)
+                                    PRINT "gold";
+                                    player.coins.gp = player.coins.gp + num
+                                CASE 1131
+                                    COLOR colors(7)
+                                    PRINT "platinum";
+                                    player.coins.pp = player.coins.pp + num
+                            END SELECT
+                            PRINT "coins";
+                            COLOR colors(15)
+                            PRINT " lying on the";
+                            PRINT " ground and picked them up."
+
+                        CASE 8
+                            IF mirror <> 7 THEN EXIT SELECT
+                            PRINT "You tripped over some roots and lost your mirror."
+                            mirror = 0
+
+                        CASE 9
+                            PRINT "A hermit told you that there are"; castlesLeft; "castles left."
+
+                        CASE 10
+                            IF invisibilityRemaining + sleepRemaining + charmsRemaining = 0 THEN EXIT SELECT
+                            PRINT "You wandered into an area where magic fades."
+                            PRINT "You lose all your present magic."
+                            invisibilityRemaining = 0
+                            sleepRemaining = 0
+                            charmsRemaining = 0
+
+                        CASE 11
+                            IF castlesLeft = 0 THEN EXIT SELECT
+                            PRINT "You met a hunter who told you of the legend of a"
+                            PRINT "castle ";
+                            num = INT(RND(1) * castlesLeft) + 1
+                            CALL WHERE_IS_IT(castle(num).coords, player.coords)
+
+                    END SELECT
+                END IF
+                IF event = NOTHING_THERE THEN
+                    SELECT CASE tracker
+                        CASE IS <> ENTERING_CASTLE
+                            PRINT "There's nothing here."
+                        CASE ENTERING_CASTLE
+                            ENTER_CASTLE:
+                            CLS
+                            tracker = 0
+                            PRINT "You made it to the enchanted castle!"
+                            SLEEP 2.5
+                            num = INT(RND(1) * 21) * 100
+                            num2 = INT(RND(1) * 9)
+                            Ax = x
+                            B = Y
+                            CLS
+
+                            Ax = CSRLIN
+                            B = POS(0)
+                            c$ = "±"
+
+                            COLOR colors(0), colors(1)
+                            FOR row = 8 TO 12
+                                LOCATE row, 21
+                                FOR i = 1 TO 13
+                                    PRINT c$;
+                                NEXT
+                                IF row = 11 THEN COLOR colors(5), colors(2)
+                            NEXT
+
+                            COLOR colors(1), colors(1)
+                            FOR i = 21 TO 33 STEP 3
+                                LOCATE 9, i
+                                PRINT c$
+                            NEXT
+
+                            COLOR colors(9), colors(3)
+                            FOR row = 7 TO 11
+                                LOCATE row, 34
+                                PRINT c$
+                            NEXT
+
+                            COLOR colors(9), colors(0)
+                            LOCATE 8, 24
+                            PRINT c$; c$
+                            LOCATE 8, 30
+                            PRINT c$; c$
+
+                            LOCATE 6, 27
+                            PRINT c$
+                            COLOR colors(0), colors(4)
+                            LOCATE 11, 27
+                            PRINT c$; c$
+
+                            COLOR colors(9), colors(3)
+                            LOCATE 6, 29
+                            PRINT c$
+                            COLOR colors(9), colors(2)
+                            LOCATE 6, 26
+                            PRINT c$
+                            LOCATE 6, 28
+                            PRINT c$
+
+                            COLOR colors(1), colors(2)
+                            LOCATE 7, 27
+                            PRINT c$
+                            COLOR colors(5), colors(2)
+                            LOCATE 10, 27
+                            PRINT c$; c$
+
+                            COLOR colors(0), colors(4)
+                            LOCATE 12, 27
+                            PRINT c$; c$
+                            COLOR colors(13), colors(4)
+                            LOCATE 12, 26
+                            PRINT c$
+
+                            COLOR colors(9), colors(0)
+                            LOCATE 7, 21
+                            PRINT c$
+                            LOCATE 7, 33
+                            PRINT c$
+                            COLOR colors(13), colors(0)
+                            LOCATE 7, 22
+                            PRINT c$
+
+
+                            LOCATE 7, 32
+                            PRINT c$
+                            COLOR colors(9), colors(3)
+                            LOCATE 7, 23
+                            PRINT c$
+                            LOCATE 7, 35
+                            PRINT c$
+
+                            COLOR colors(5), colors(2)
+                            LOCATE 10, 23
+                            PRINT c$
+                            COLOR colors(10), colors(0)
+                            LOCATE 11, 23
+                            PRINT c$
+
+                            COLOR colors(9), colors(3)
+                            LOCATE 11, 26
+                            PRINT c$
+                            COLOR colors(1), colors(2)
+                            LOCATE 10, 26
+                            PRINT c$
+                            COLOR colors(13), colors(4)
+                            LOCATE 12, 34
+                            PRINT c$
+
+                            COLOR colors(9), colors(0)
+                            LOCATE 8, 23
+                            PRINT c$
+                            COLOR colors(1), colors(0)
+                            LOCATE 7, 26
+                            PRINT c$
+                            LOCATE 7, 28
+                            PRINT c$
+
+                            COLOR colors(9), colors(3)
+                            LOCATE 7, 29
+                            PRINT c$
+                            COLOR colors(1), colors(2)
+                            LOCATE 10, 31
+                            PRINT c$;
+                            COLOR colors(5), colors(0)
+                            PRINT c$
+
+                            COLOR colors(9), colors(0)
+                            LOCATE 11, 31
+                            PRINT c$;
+                            COLOR colors(1), colors(0)
+                            PRINT c$
+                            COLOR colors(9), colors(0)
+                            LOCATE 8, 29
+                            PRINT c$
+
+                            LOCATE Ax, B
+                            COLOR colors(15), colors(0)
+                            SLEEP 1
+
+                            PRINT "You found"; num; "gp there."
+                            player.treasure.gp = player.treasure.gp + num
+                            IF num2 <> 7 OR mirror = 7 THEN
+                                num2 = INT(RND(1) * 20)
+                                IF num2 = 2 THEN combatStrengthRemaining = 2 * combatStrengthRemaining
+                                IF num2 = 2 THEN PRINT "You also found an enchanted sword which doubles ";
+                                IF num2 = 2 THEN PRINT "your strength."
+                                FOR i = 1 TO castlesLeft - 1
+                                    IF castle(i).coords.x = player.coords.x AND castle(i).coords.y = player.coords.y THEN
+                                        FOR j = i TO castlesLeft - 1
+                                            castle(j).coords.x = castle(j + 1).coords.x
+                                            castle(j).coords.y = castle(j + 1).coords.y
+                                        NEXT
+                                    END IF
+                                NEXT
+                                PRINT "The castle vanishes."
+                                world(player.coords.x, player.coords.y) = 0
+                                castlesLeft = castlesLeft - 1
+                                IF castlesLeft = 0 THEN PRINT "You found the last of the castles!"
+                                EXIT SELECT
+                            END IF
+                            PRINT "You also found a mirror which will kill any "; colored(basilisk, colors()); "s";
+                            COLOR colors(15)
+                            PRINT " you meet."
+                            mirror = 7
+                            num2 = INT(RND(1) * 20)
+                            IF num2 = 2 THEN combatStrengthRemaining = 2 * combatStrengthRemaining
+                            IF num2 = 2 THEN PRINT "You also found an enchanted sword which doubles ";
+                            IF num2 = 2 THEN PRINT "your strength."
+                            FOR i = 1 TO castlesLeft - 1
+                                IF castle(i).coords.x = player.coords.x AND castle(i).coords.y = player.coords.y THEN
+                                    FOR j = i TO castlesLeft - 1
+                                        castle(j) = castle(j + 1)
+                                        castle(j) = castle(j + 1)
+                                    NEXT
+                                END IF
+                            NEXT
+                            PRINT "The castle vanishes."
+                            world(player.coords.x, player.coords.y) = 0
+                            castlesLeft = castlesLeft - 1
+                            IF castlesLeft = 0 THEN PRINT "There are no castles left to find."
+
+                    END SELECT
+                    GOTO WHERE_TO
+                END IF
+                event = rollD(1, 16)
+                IF event = GIANT_BAT THEN
+                    PRINT "A "; colored(giantBat, colors());
+                    COLOR colors(15)
+                    PRINT " grabbed you and carried you to a new spot."
+                    SLEEP 2.5
+                    DIM newCoords AS Coordinates
+                    newCoords = player.coords
+                    tracker = 0
+                    daysInForest = daysInForest + .1
+                    DO
+                        newCoords.x = INT(RND(1) * 100) + 1 'random location
+                        newCoords.y = INT(RND(1) * 100) + 1
+                    LOOP UNTIL world(newCoords.x, newCoords.y) < 2 'we don't want to land on a wall, inn, or castle
+                    player.coords = newCoords
+                    GOTO CHECK_MAP
+                END IF
+                IF event = FALL_IN_PIT THEN
+                    PIT:
+                    PRINT "You fell into a "; colored(pit, colors());
+                    COLOR colors(15)
+                    PRINT ".";
+                    world(player.coords.x, player.coords.y) = 4
+                    num = INT((RND(1) * 21) + .001 * player.treasure.gp)
+                    combatStrengthRemaining = combatStrengthRemaining - num
+                    PRINT "Trying to get out..."
+                    SLEEP 2.5
+                    IF combatStrengthRemaining <= 0 THEN
+                        PRINT "You died trying to get out!"
+                        LOSS
+                        RUN
+                    END IF
+                    PRINT "You used"; num; "Combat Points to get out."
+                    PRINT "Your Combat Strength is now"; combatStrengthRemaining
+                    num = 11
+                    SLEEP 1
+                    GOTO DISPLACEMENT
+                END IF
+                IF event = GIANT_EAGLE THEN
+                    j = 0
+                    FOR i = 1 TO 11
+                        j = j + numbers(i)
+                    NEXT
+                    IF j < 11 GOTO WHAT_HAPPENS_HERE
+
+                    GIANT_EAGLE: PRINT "A "; colored(giantEagle, colors());
+                    COLOR colors(15)
+                    PRINT " carried you to safety.";
+                    SLEEP 2.5
+                    tracker = 0
+                    exitForest = 1
+                    EXIT DO
+                END IF
+                IF event = 15 OR event = 16 THEN
+                    howManyMonsters = NO_GUARDIAN
+                    GOTO WHAT_HAPPENS_HERE
+                END IF
+                n = event
+                DO
+                    m = rollD(1, monsterCount)
+                    currentMonster = monster(m)
+                    howManyMonsters = INT(rollD(1, 100) / (currentMonster.cr * 10 + .6125))
+                    IF howManyMonsters = 0 THEN howManyMonsters = 1
+                LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, howManyMonsters)
+                SELECT CASE howManyMonsters
+                    CASE 1
+                        monster$ = currentMonster.name
+                        startsWith$ = LEFT$(monster$, 1)
+                        SELECT CASE startsWith$
+                            CASE "a", "e", "i", "o", "u"
+                                PRINT "An ";
+                            CASE ELSE
+                                PRINT "A ";
+                        END SELECT
+                        PRINT colored(currentMonster, colors());
+                        PRINT USING " (Challenge Rating&)"; STR$(currentMonster.cr);
+                        COLOR colors(15)
+                        PRINT " is guarding ";
+                    CASE IS <> 1
+                        currentMonster.name = currentMonster.plural
+                        PRINT howManyMonsters;
+                        PRINT colored(currentMonster, colors());
+                        PRINT USING " (Challenge Rating&)"; STR$(currentMonster.cr);
+                        COLOR colors(15)
+                        PRINT " are guarding ";
+                END SELECT
+                monster = currentMonster.cr * howManyMonsters * 10
+                recommendedCombatStrength = INT(monster * 2 + getWeightCarried(player) / 100)
+                event = rollD(1, 14)
+
+                IF (event = 12 OR event = 13 OR event = PRIZE_IS_SPELL) AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
+                IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN PRINT "Nothing is guarding ";
+                IF event > 11 THEN
+                    IF event <> PRIZE_IS_SPELL THEN
+                        IF event > 11 THEN PRINT "nothing"
+                        points = 0
+                    ELSE
+                        guardedSpell = rollD(1, 3)
+                        tracker = guardedSpell + 5 'SPELL_1_IS_GUARDED,SPELL_2_IS_GUARDED,SPELL_3_IS_GUARDED
+                        PRINT "a ";
+                        COLOR colors(itemColor(guardedSpell))
+                        PRINT items$(guardedSpell)
+                        COLOR colors(15)
+                        points = INT(RND(1) * 11)
+                    END IF
+                ELSE currentTreasure = rollD(1, treasureCount)
+                    points = treasure(currentTreasure).value.gp
+                    IF currentTreasure > 2 THEN
+                        SELECT CASE currentTreasure
+                            CASE 1 TO 100
+                                ignore9and10 = 0
+
+                                DO
+                                    roll = rollD(1, 8 + 2 * ignore9and10)
+                                    SELECT CASE roll
+                                        CASE 1
+                                            ignore9and10 = 1
+                                            IF points < .5 THEN
+                                                points = .5
+                                            ELSEIF points < 1 THEN points = 1
+                                            ELSEIF points < 5 THEN points = 5
+                                            ELSEIF points < 10 THEN points = 10
+                                            ELSEIF points < 50 THEN points = 50
+                                            ELSEIF points < 100 THEN points = 100
+                                            ELSEIF points < 500 THEN points = 500
+                                            ELSEIF points < 1000 THEN points = 1000
+                                            ELSEIF points < 5000 THEN points = 5000
+                                            ELSEIF points < 10000 THEN points = 10000
+                                            ELSEIF points < 25000 THEN points = 25000
+                                            ELSEIF points < 50000 THEN points = 50000
+                                            ELSEIF points < 100000 THEN points = 100000
+                                            ELSEIF points < 250000 THEN points = 250000
+                                            ELSEIF points < 500000 THEN points = 500000
+                                            ELSE points = 1000000
+                                            END IF
+                                        CASE 2
+                                            points = points * 2
+                                            EXIT DO
+                                        CASE 3
+                                            roll = rollD(1, 6)
+                                            points = points + points * roll / 10
+                                            EXIT DO
+                                        CASE 9
+                                            roll = rollD(1, 6)
+                                            points = points - points * roll / 10
+                                            EXIT DO
+                                        CASE 10
+                                            ignore9and10 = 1
+                                            IF points > 1000000 THEN
+                                                points = 1000000
+                                            ELSEIF points > 500000 THEN points = 500000
+                                            ELSEIF points > 250000 THEN points = 250000
+                                            ELSEIF points > 100000 THEN points = 100000
+                                            ELSEIF points > 50000 THEN points = 50000
+                                            ELSEIF points > 25000 THEN points = 25000
+                                            ELSEIF points > 10000 THEN points = 10000
+                                            ELSEIF points > 5000 THEN points = 5000
+                                            ELSEIF points > 1000 THEN points = 1000
+                                            ELSEIF points > 500 THEN points = 500
+                                            ELSEIF points > 100 THEN points = 100
+                                            ELSEIF points > 50 THEN points = 50
+                                            ELSEIF points > 10 THEN points = 10
+                                            ELSEIF points > 5 THEN points = 5
+                                            ELSEIF points > 1 THEN points = 1
+                                            ELSE points = .5
+                                            END IF
+                                    END SELECT
+                                LOOP
+                            CASE 101 TO 200
+                                appraising = 1
+                                treatAsPlat = 0
+                                treatAsGemmedSilver = 0
+                                IF treasure(currentTreasure).value.gp = 2000 THEN treatAsPlat = 1
+                                IF treasure(currentTreasure).value.gp = 1000 THEN treatAsGemmedSilver = 1
+
+                                DO
+                                    roll = rollD(1, 10)
+                                    SELECT CASE roll
+                                        CASE 1
+                                            SELECT CASE points
+                                                CASE 2000
+                                                    IF currentTreasure = treasure - 1 AND treatAsPlat = 1 THEN
+                                                        points = 12000
+                                                    ELSE points = 8000
+                                                    END IF
+                                                CASE 8000
+                                                    treatAsPlat = 1
+                                                    points = 2000
+                                                CASE 6000
+                                                    points = 2000
+                                                CASE 1000
+                                                    IF treatAsGemmedSilver = 1 THEN
+                                                        points = 6000
+                                                    ELSE points = 200
+                                                    END IF
+                                                CASE 3000
+                                                    points = 1000
+                                                    treatAsGemmedSilver = 1
+                                                CASE 1800
+                                                    points = 500
+                                                CASE 1200
+                                                    points = 300
+                                                CASE 500
+                                                    points = 3000
+                                                CASE 300
+                                                    points = 1800
+                                                CASE 200
+                                                    points = 1200
+                                                CASE 100
+                                                    points = 1000
+                                            END SELECT
+                                    END SELECT
+                                LOOP WHILE roll = 1 AND points < 12000
+                        END SELECT
+                    END IF
+                    COLOR colors(treasure(currentTreasure).color)
+                    PRINT treasure(currentTreasure).name;
+                    COLOR colors(15)
+                    PRINT USING " (& gp)."; LTRIM$(STR$(points))
+                END IF
+                IF currentMonster.id = basilisk.id AND mirror = 7 THEN
+                    835 PRINT "Your mirror killed the "; colored(currentMonster, colors())
+                    COLOR colors(15)
+                    numbers(5) = numbers(5) + 1
+                    monster = 0
+                    GOTO 500
+                END IF
+
+                IF howManyMonsters = 100 THEN
+                    PRINT "You get the treasure free!"
+                ELSE
+                    280
+                    DO
+                        INPUT "Do you wish to (1)fight, (2)run, (3)bribe, OR (4) cast a spell?"; k280
+                    LOOP UNTIL k280 >= 1 AND k280 <= 4
+                    SELECT CASE k280
+                        CASE 1
+                            FIGHT:
+                            DO
+                                COLOR colors(14), colors(6)
+                                PRINT "Recommended Combat Points:"; recommendedCombatStrength + 1
+                                COLOR colors(12), colors(4)
+                                INPUT "How many Combat Points do you wish to use"; k
+                                COLOR colors(15), colors(0)
+                                SELECT CASE k
+                                    CASE IS > combatStrengthRemaining
+                                        PRINT "You only have"; combatStrengthRemaining; "Combat Points."
+                                    CASE IS < 1
+                                    CASE IS < 5, IS >= combatStrengthRemaining - 10
+                                        COLOR colors(12), colors(4)
+                                        INPUT "Are you sure? Type the number again to confirm."; k2
+                                        COLOR colors(15), colors(0)
+                                        IF k = k2 THEN EXIT DO
+                                    CASE ELSE
+                                        EXIT DO
+                                END SELECT
+                            LOOP
+                            IF 0 = 1 THEN
+                                monsterHealth = rollD(currentMonster.hitDice.quantity, currentMonster.hitDice.sides + modifier(currentMonster.abilities.con))
+
+                                DO
+                                    PRINT "the monster ";
+                                    IF check(currentMonster.abilities.str, ac(currentMonster)) = 1 THEN
+                                        damage = rollD(quantity(num), die(num)) + modifier(currentMonster.abilities.str)
+                                        combatStrengthRemaining = combatStrengthRemaining - damage
+                                        PRINT "s and deals"; damage; "damage."
+                                    ELSE PRINT "es."
+                                    END IF
+
+                                    IF combatStrengthRemaining <= 0 THEN
+                                        CALL DEFEATED_BY(currentMonster, colors())
+                                        RUN
+                                    END IF
+                                    PRINT "You ";
+                                    IF check(player.abilities.str, ac(player)) = 1 THEN
+                                        damage = rollD(player.hitDice.quantity, player.hitDice.sides) + modifier(player.abilities.str)
+                                        monsterHealth = monsterHealth - damage
+                                        PRINT " and deal"; damage; "damage."
+                                    ELSE PRINT
+                                    END IF
+                                    IF monsterHealth <= 0 THEN EXIT SELECT
+                                LOOP
+                            ELSE
+                                num = INT(RND(1) * 1001)
+                                l = 2
+                                combatStrengthRemaining = combatStrengthRemaining - k
+                                IF getEncumbrance(player) > 15 THEN k = k - .01 * getWeightCarried(player)
+
+                                FOR i = 1000 TO 0 STEP -50
+                                    IF i < num THEN
+                                        CALL DEFEATED_BY(currentMonster, colors())
+                                        RUN
+                                    END IF
+                                    IF l * monster <= k THEN EXIT SELECT
+                                    l = l - .1
+                                NEXT i
+                            END IF
+
+                            CALL DEFEATED_BY(currentMonster, colors())
+                            RUN
+                        CASE 2
+                            RUN_AWAY: num = INT(RND(1) * 12)
+                            IF num = 11 THEN
+                                CALL DEFEATED_BY(currentMonster, colors())
+                                RUN
+                            END IF
+                            FOR i = 0 TO 10
+                                IF i * 10 > monster AND i <= num THEN GOTO DISPLACEMENT
+                            NEXT
+                            CALL COMPELLED
+                            GOTO FIGHT
+
+
+
+                        CASE 3
+                            OFFER:
+                            DO
+                                COLOR colors(10), colors(2)
+                                PRINT "How many gold points do you wish to pay?";
+                                INPUT k
+                                COLOR colors(15), colors(0)
+                                IF k > player.coins.pp * 10 + player.coins.gp + player.coins.ep / 2 + player.coins.sp / 10 + player.coins.cp / 100 THEN
+                                    PRINT "You only have"; player.coins.pp * 10 + player.coins.gp + player.coins.ep / 2 + player.coins.sp / 10 + player.coins.cp; "gp."
+                                ELSE
+                                    EXIT DO
+                                END IF
+                            LOOP
+                            pp = INT(k / 10)
+                            gp = INT(k) MOD 10
+                            ep = INT(k * 2) MOD 2
+                            sp = INT(k * 10) MOD 5
+                            cp = INT(k * 100) MOD 10
+                            p = 0
+                            g = 0
+                            e = 0
+                            s = 0
+                            c = 0
+                            WHILE p < pp AND p < player.coins.pp
+                                p = p + 1
+                            WEND
+                            IF p < pp THEN gp = gp + 10 * (pp - p)
+                            WHILE g < gp AND g < player.coins.gp
+                                g = g + 1
+                            WEND
+                            IF g < gp THEN ep = ep + 2 * (gp - g)
+                            WHILE e < ep AND e < player.coins.ep
+                                e = e + 1
+                            WEND
+                            IF e < ep THEN sp = sp + 10 * (ep - e)
+                            WHILE s < sp AND s < player.coins.sp
+                                s = s + 1
+                            WEND
+                            IF s < sp THEN cp = cp + 10 * (sp - s)
+                            WHILE c < cp AND c < player.coins.sp
+                                c = c + 1
+                            WEND
+                            IF c < cp THEN
+                                PRINT "You don't have exact change!"
+                                GOTO OFFER
+                            END IF
+
+                            num = INT(RND(1) * 22)
+                            l = 0
+                            IF num = 21 OR (num > 15 AND k < 2) THEN
+                                CALL DEFEATED_BY(currentMonster, colors())
+                                RUN
+                            END IF
+                            num2 = (points + (monster * .1)) * howManyMonsters
+                            IF k < 2 GOTO 475
+                            FOR i = 0 TO 20
+                                IF k <= num2 * l AND num >= i GOTO 475
+                                l = l + .1
+                            NEXT
+                            GOTO 485
+
+                            475 PRINT "Your bribe was not accepted.";
+
+                            CALL COMPELLED
+                            GOTO FIGHT
+
+                            485 points = 0
+                            player.coins.pp = player.coins.pp - p
+                            player.coins.gp = player.coins.gp - g
+                            player.coins.ep = player.coins.ep - e
+                            player.coins.sp = player.coins.sp - s
+                            player.coins.cp = player.coins.cp - c
+                            bribeCt = bribeCt + 1
+                            player.xp = player.xp + xp(monster(n).cr, howManyMonsters)
+                            tracker = 0
+                            PRINT "Your bribe was accepted.";
+                            PRINT "You now have"; getWorth(player.coins); "gp."
+                        CASE 4
+                            CAST_A_SPELL:
+                            DO
+                                IF tracker = SLEEP_SPELL OR tracker = CHARM_SPELL OR tracker = INVISIBILITY_SPELL THEN
+                                    PRINT "You can't use magic to get magic."
+                                    GOTO 280
+                                END IF
+                                IF sleepRemaining + invisibilityRemaining + charmsRemaining = 0 THEN
+                                    PRINT "You have no magic."
+                                    GOTO 280
+                                END IF
+                                COLOR colors(13), colors(5)
+                                INPUT "What type of spell-(1)sleep, (2)charm, OR (3)invisibility"; k
+                                COLOR colors(15), colors(0)
+                                PRINT
+
+                            LOOP WHILE k < 1 OR k > 3
+                            ohNo = 0
+                            SELECT CASE k
+                                CASE 1
+                                    IF sleepRemaining = 0 THEN
+                                        PRINT "You have no sleep spells.";
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    IF currentMonster.disallowSleep = 1 THEN
+                                        PRINT "You can't put "; currentMonster.plural; " to sleep.";
+                                        sleepRemaining = sleepRemaining - 1
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    num = rollD(1, 10) - 1
+                                    sleepRemaining = sleepRemaining - 1
+                                    IF num < SLEEP_SUCCESS THEN
+                                        PRINT "Your spell was unsuccessful.";
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                CASE 2
+                                    IF charmsRemaining = 0 THEN
+                                        PRINT "You have no charms.";
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    IF currentMonster.disallowCharm = 1 THEN
+                                        PRINT "You can't charm "; currentMonster.plural; ".";
+                                        charmsRemaining = charmsRemaining - 1
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    num = INT(RND(1) * 10)
+                                    charmsRemaining = charmsRemaining - 1
+                                    IF (monster < 60 AND num > 6) OR (monster > 50 AND num < 2) THEN
+                                        PRINT "Your charm didn't work.";
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    IF num = 3 THEN
+                                        PRINT "The charm wore off too soon."
+                                        GOTO 713
+                                    END IF
+                                    num = 3
+                                CASE 3
+                                    IF invisibilityRemaining = 0 THEN
+                                        PRINT "You have no invisibility spells.";
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    IF currentMonster.disallowInvisibility = 1 THEN
+                                        PRINT "Oops, "; currentMonster.plural; " can find invisible people!";
+                                        invisibilityRemaining = invisibilityRemaining - 1
+                                        ohNo = 1
+                                        EXIT SELECT
+                                    END IF
+                                    num = INT(RND(1) * 10)
+                                    invisibilityRemaining = invisibilityRemaining - 1
+                                    IF monster > 50 AND num > 8 THEN
+                                        PRINT "The "; colored(currentMonster, colors());
+                                        COLOR colors(15)
+                                        PRINT " smelled you!"
+                                        GOTO 713
+                                    END IF
+                                    IF monster < 60 AND num = 0 THEN
+                                        PRINT "Your invisibility wore off too soon!"
+                                        GOTO 713
+                                    END IF
+                                    num = 3
+                            END SELECT
+                            IF ohNo = 1 THEN
+                                CALL COMPELLED
+                                GOTO FIGHT
+                            ELSE
+                                IF num < 8 THEN
+                                    PRINT "You got the treasure safely."
+                                    GOTO 500
+                                END IF
+                                PRINT "The "; colored(currentMonster, colors());
+                                COLOR colors(15)
+                                PRINT " woke too soon."
+
+                                713 points = INT(RND(1) * points)
+                                player.treasure.gp = player.treasure.gp + points
+                                PRINT "You got away with"; points; "gp."
+                                GOTO WHERE_TO
+                            END IF
+                    END SELECT
+                    numbers(n) = numbers(n) + howManyMonsters
+                    player.xp = player.xp + xp(monster(n).cr, howManyMonsters)
+                    PRINT "You beat the "; colored(currentMonster, colors())
+                    COLOR colors(15)
+                    PRINT USING "Your Combat Strength is now&."; STR$(combatStrengthRemaining)
+                END IF
+
+                500 IF n < 12 THEN
+                    event = INT(RND(1) * 7)
+                    IF event = NOISY_BATTLE THEN
+                        DO
+                            m = rollD(1, monsterCount)
+                            currentMonster = monster(m)
+                        LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
+                        howManyMonsters = 1
+                        monster = currentMonster.cr * 10
+                        PRINT "A "; colored(currentMonster, colors());
+                        COLOR colors(15)
+                        PRINT " heard the noise of the battle and came wandering by."
+                        recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
+
+                        945 IF currentMonster.id = basilisk.id AND mirror = 7 GOTO 835
+
+                        ENGAGED:
+                        DO
+                            INPUT "Do you wish to (1)fight, (2)run, or (3)cast a spell?"; k
+                        LOOP WHILE k < 1 OR k > 3
+                        SELECT CASE k
+                            CASE 1
+                                GOTO FIGHT
+                            CASE 2
+                                GOTO RUN_AWAY
+                            CASE 3
+                                GOTO CAST_A_SPELL
+                        END SELECT
+                    END IF
+                END IF
+                IF howManyMonsters = NO_GUARDIAN THEN
+                    event = INT(RND(1) * 5)
+                    IF event = NOISY_BATTLE THEN
+                        DO
+                            m = rollD(1, monsterCount)
+                            currentMonster = monster(m)
+                        LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
+                        howManyMonsters = 1
+                        monster = currentMonster.cr * 10
+                        PRINT "A "; colored(currentMonster, colors());
+                        COLOR colors(15)
+                        PRINT " heard the noise of the battle and came wandering by."
+                        recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
+                        GOTO 945
+                    END IF
+                END IF
+                IF points <> 0 THEN
+                    player.treasure.gp = player.treasure.gp + points
+                    IF points = 25 THEN
+                        num = INT(RND(1) * 2) + 1
+                        SELECT CASE num
+                            CASE 1
+                                combatStrengthRemaining = 2 * combatStrengthRemaining
+                                PRINT "You won an enchanted sword. Your Combat Strength "
+                                PRINT "is doubled and is now"; combatStrengthRemaining
+                            CASE 2
+                                PRINT "You won an ordinary sword."
+                        END SELECT
+                    ELSEIF tracker = SLEEP_SPELL OR tracker = CHARM_SPELL OR tracker = INVISIBILITY_SPELL THEN
+                        player.treasure.gp = player.treasure.gp - points
+                        LEARN_SPELL:
+                        event = INT(RND(1) * 10)
+                        IF event = UNABLE_TO_MASTER_SPELL THEN
+                            PRINT "You were unable to master the spell.";
+                            PRINT "You gain no ";
+                            COLOR colors(itemColor(tracker - 5)) 'SPELL_#_IS_GUARDED
+                            PRINT items$(tracker - 5); 'SPELL_#_IS_GUARDED
+                            COLOR colors(15)
+                            PRINT "s"
+                            GOTO WHERE_TO
+                        END IF
+                        SELECT CASE tracker
+                            CASE SLEEP_SPELL
+                                sleepRemaining = sleepRemaining + 1
+                                sleepMax = sleepMax + 1
+                            CASE CHARM_SPELL
+                                charmsRemaining = charmsRemaining + 1
+                                charmsMax = RA + 1
+                            CASE INVISIBILITY_SPELL
+                                invisibilityRemaining = invisibilityRemaining + 1
+                                invisibilityMax = invisibilityMax + 1
+                        END SELECT
+                        PRINT "You won the ";
+                        COLOR colors(itemColor(tracker - 5)) 'SPELL_#_IS_GUARDED
+                        PRINT items$(tracker - 5) 'SPELL_#_IS_GUARDED
+                        COLOR colors(15)
+                        tracker = 0
+                        IF sleepMax / 5 + charmsMax / 3 + invisibilityMax / 2 > 6 THEN
+                            INPUT "Your magic total is rather large. Do you wish to convert it to Combat Points?"; X$
+                            IF UCASE$(X$) = "Y" THEN
+                                sleepMax = sleepMax - 5
+                                charmsMax = charmsMax - 3
+                                invisibilityMax = invisibilityMax - 2
+                                IF sleepMax <= 0 THEN sleepMax = 1
+                                IF charmsMax <= 0 THEN charmsMax = 1
+                                IF invisibilityMax <= 0 THEN invisibilityMax = 1
+                                sleepRemaining = sleepMax
+                                charmsRemaining = charmsMax
+                                invisibilityRemaining = invisibilityMax
+                                buff = 100
+                                combatStrengthRemaining = combatStrengthRemaining + buff
+                                maxCombatStrength = maxCombatStrength + buff
+                                PRINT "Your Combat Strength is permanently increased by"; buff
+                            END IF
+                        END IF
+                        GOTO WHERE_TO
+                    END IF
+                    PRINT "You now have"; player.treasure.gp; "Treasure Points."
+                    IF points = 200 THEN
+                        num2 = INT(RND(1) * 10)
+                        num = INT(RND(1) * 10)
+                        IF num2 = 7 AND mirror <> 7 THEN
+                            mirror = 7
+                            PRINT "There was a mirror in the chest. It'll protect you"
+                            PRINT "against any "; colored(basilisk, colors()); "s";
+                            COLOR colors(15)
+                            PRINT " you may meet."
+                            mirror = 7
+                            GOTO WHERE_TO
+                        END IF
+                        IF num = 1 THEN
+                            830 PRINT "The treasure chest was a mimic!";
+                            currentMonster = mimic
+                            monster = mimic.cr * 10
+                            PRINT "A "; colored(mimic, colors());
+                            COLOR colors(15)
+                            PRINT " heard the noise of the battle and came wandering by."
+                            recommendedCombatStrength = INT(mimic.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
+                            GOTO ENGAGED
+                        END IF
+                    END IF
+                END IF
+                IF tracker = ENTERING_CASTLE THEN GOSUB ENTER_CASTLE
+        END SELECT
+
+        WHERE_TO:
+        INPUT "Which direction? (Press 0 for the map.)"; X$
+        IF X$ = "0" THEN
+            tracker = CHECKING_MAP
+            _CONTINUE
+        END IF
+        X$ = UCASE$(X$)
+        tracker = 0
+        k = 1
+        daysInForest = daysInForest + k / 10
+        IF daysInForest < 30 THEN
+
+            X$ = UCASE$(X$)
+            SELECT CASE VAL(X$)
+                CASE 1
+                    X$ = "SW"
+                CASE 2
+                    X$ = "S"
+                CASE 3
+                    X$ = "SE"
+                CASE 4
+                    X$ = "W"
+                CASE 5
+                    GOTO WHERE_TO
+                CASE 6
+                    X$ = "E"
+                CASE 7
+                    X$ = "NW"
+                CASE 8
+                    X$ = "N"
+                CASE 9
+                    X$ = "NE"
+            END SELECT
+
+            IF LEFT$(X$, 1) = "N" THEN
+                newCoords.y = player.coords.y - k
+            ELSEIF LEFT$(X$, 1) = "S" THEN
+                newCoords.y = player.coords.y + k
+            ELSE newCoords.y = player.coords.y
+
+            END IF
+            IF RIGHT$(X$, 1) = "E" THEN
+                newCoords.x = player.coords.x + k
+            ELSEIF RIGHT$(X$, 1) = "W" THEN
+                newCoords.x = player.coords.x - k
+            ELSE newCoords.x = player.coords.x
+            END IF
+            SELECT CASE world(player.coords.x, player.coords.y)
+                CASE 0
+                    combatStrengthRemaining = combatStrengthRemaining - (getEncumbrance(player))
+                CASE 1
+                    combatStrengthRemaining = combatStrengthRemaining - 2 * (getEncumbrance(player))
+            END SELECT
+            IF combatStrengthRemaining <= 0 THEN
+                PRINT "You died from lack of strength.";
+                LOSS
+                RUN
+            END IF
+            IF newCoords.x > 100 OR newCoords.x < 1 OR newCoords.y > 100 OR newCoords.y < 1 THEN
+                leftForest = 1
+                EXIT DO
+            END IF
+            IF world(newCoords.x, newCoords.y) = 7 THEN tracker = ENTERING_CASTLE
+            IF world(newCoords.x, newCoords.y) = 4 GOTO PIT
+            IF world(newCoords.x, newCoords.y) = 2 THEN
+                PRINT "You tried to go through a wall."
+                combatStrengthRemaining = combatStrengthRemaining - INT(RND(1) * player.treasure.gp * .005) - 25
+                PRINT USING "Your Combat Strength is now&."; STR$(combatStrengthRemaining)
+                GOTO WHERE_TO
+            END IF
+            IF world(newCoords.x, newCoords.y) = 3 THEN
+                PRINT newCoords.x
+                PRINT newCoords.y
+                newCoords.x = player.coords.x
+                newCoords.y = player.coords.y
+                IF maxCombatStrength > combatStrengthRemaining THEN combatStrengthRemaining = maxCombatStrength
+                world(player.coords.x, player.coords.y) = world(newCoords.x, newCoords.y)
+                tracker = ENTERING_INN
+                invisibilityRemaining = invisibilityMax
+                charmsRemaining = charmsMax
+                sleepRemaining = sleepMax
+                GOSUB CHECK_MAP
+                PRINT "You stopped at an inn and regained your strength."
+                WHILE player.treasure.gp >= 10
+                    player.treasure.gp = player.treasure.gp - 10
+                    player.coins.pp = player.coins.pp + 1
+                WEND
+
+                WHILE player.treasure.gp >= 1
+                    player.treasure.gp = player.treasure.gp - 1
+                    player.coins.gp = player.coins.gp + 1
+                WEND
+
+                WHILE player.treasure.gp >= .5
+                    player.treasure.gp = player.treasure.gp - .5
+                    player.coins.ep = player.coins.ep + 1
+                WEND
+
+                WHILE player.treasure.gp >= .1
+                    player.treasure.gp = player.treasure.gp - .1
+                    player.coins.sp = player.coins.sp + 1
+                WEND
+
+                WHILE player.treasure.gp >= .01
+                    player.treasure.gp = player.treasure.gp - .01
+                    player.coins.cp = player.coins.cp + 1
+                WEND
+                PRINT "You exchanged your treasure for coins."
+                DIM balanceDue AS DOUBLE
+                balanceDue = RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75
+                IF balanceDue < 5 THEN
+                    SELECT CASE (getWorth(player.treasure) + getWorth(player.coins))
+                        CASE IS > 5
+                            balanceDue = 5
+                        CASE IS <= 5
+                            balanceDue = 0
+                    END SELECT
+                END IF
+                gp = INT(balanceDue) MOD 10
+                ep = INT(balanceDue * 2) MOD 2
+                sp = INT(balanceDue * 10) MOD 5
+                cp = INT(balanceDue * 100) MOD 10
+                paid = 0.0
+
+                WHILE balanceDue - paid >= 10 AND player.coins.pp > 0
+                    IF player.coins.pp > 0 THEN
+                        player.coins.pp = player.coins.pp - 1
+                        paid = paid + 10
+                        IF paid > balanceDue THEN
+                            player.coins.gp = player.coins.gp + 9
+                            paid = paid - 9
+                        END IF
+                    END IF
+                WEND
+
+                WHILE balanceDue - paid >= 1 AND player.coins.pp + player.coins.gp > 0
+                    IF player.coins.gp > 0 THEN
+                        player.coins.gp = player.coins.gp - 1
+                        paid = paid + 1
+                        IF paid > balanceDue THEN
+                            player.coins.ep = player.coins.ep + 1
+                            paid = paid - .5
+                        END IF
+                    ELSEIF player.coins.pp > 0 THEN
+                        player.coins.pp = player.coins.pp - 1
+                        paid = paid + 10
+                        IF paid > balanceDue THEN
+                            player.coins.gp = player.coins.gp + 9
+                            paid = paid - 9
+                        END IF
+                    END IF
+                WEND
+
+                WHILE balanceDue - paid >= .5 AND player.coins.pp + player.coins.gp + player.coins.ep > 0
+                    IF player.coins.ep > 0 THEN
+                        player.coins.ep = player.coins.ep - 1
+                        paid = paid + .5
+                        IF paid > balanceDue THEN
+                            player.coins.sp = player.coins.sp + 4
+                            paid = paid - .4
+                        END IF
+                    ELSEIF player.coins.gp > 0 THEN
+                        player.coins.gp = player.coins.gp - 1
+                        paid = paid + 1
+                        IF paid > balanceDue THEN
+                            player.coins.ep = player.coins.ep + 1
+                            paid = paid - .5
+                        END IF
+                    ELSEIF player.coins.pp > 0 THEN
+                        player.coins.pp = player.coins.pp - 1
+                        paid = paid + 10
+                        IF paid > balanceDue THEN
+                            player.coins.gp = player.coins.gp + 9
+                            paid = paid - 9
+                        END IF
+                    END IF
+                WEND
+                WHILE balanceDue - paid >= .1 AND player.coins.pp + player.coins.gp + player.coins.ep + player.coins.sp > 0
+                    IF player.coins.sp > 0 THEN
+                        player.coins.sp = player.coins.sp - 1
+                        paid = paid + .1
+                        IF paid > balanceDue THEN
+                            player.coins.cp = player.coins.cp + 9
+                            paid = paid - .9
+                        END IF
+                    ELSEIF player.coins.ep > 0 THEN
+                        player.coins.ep = player.coins.ep - 1
+                        paid = paid + .5
+                        IF paid > balanceDue THEN
+                            player.coins.sp = player.coins.sp + 4
+                            paid = paid - .4
+                        END IF
+                    ELSEIF player.coins.gp > 0 THEN
+                        player.coins.gp = player.coins.gp - 1
+                        paid = paid + 1
+                        IF paid > balanceDue THEN
+                            player.coins.ep = player.coins.ep + 1
+                            paid = paid - .5
+                        END IF
+                    ELSEIF player.coins.pp > 0 THEN
+                        player.coins.pp = player.coins.pp - 1
+                        paid = paid + 10
+                        IF paid > balanceDue THEN
+                            player.coins.gp = player.coins.gp + 9
+                            paid = paid - 9
+                        END IF
+                    END IF
+                WEND
+                WHILE balanceDue - paid >= .01 AND player.coins.pp + player.coins.gp + player.coins.ep + player.coins.sp + player.coins.cp > 0
+                    IF player.coins.cp > 0 THEN
+                        player.coins.cp = player.coins.cp - 1
+                        paid = paid + .01
+                    ELSEIF player.coins.sp > 0 THEN
+                        player.coins.sp = player.coins.sp - 1
+                        paid = paid + .1
+                        IF paid > balanceDue THEN
+                            player.coins.cp = player.coins.cp + 9
+                            paid = paid - .9
+                        END IF
+                    ELSEIF player.coins.ep > 0 THEN
+                        player.coins.ep = player.coins.ep - 1
+                        paid = paid + .5
+                        IF paid > balanceDue THEN
+                            player.coins.sp = player.coins.sp + 4
+                            paid = paid - .4
+                        END IF
+                    ELSEIF player.coins.gp > 0 THEN
+                        player.coins.gp = player.coins.gp - 1
+                        paid = paid + 1
+                        IF paid > balanceDue THEN
+                            player.coins.ep = player.coins.ep + 1
+                            paid = paid - .5
+                        END IF
+                    ELSEIF player.coins.pp > 0 THEN
+                        player.coins.pp = player.coins.pp - 1
+                        paid = paid + 10
+                        IF paid > balanceDue THEN
+                            player.coins.gp = player.coins.gp + 9
+                            paid = paid - 9
+                        END IF
+                    END IF
+                WEND
+                PRINT "You paid"; charge; "gp to stay there."
+                PRINT "You now have"; getWorth(player.coins); "gp."
+                num = INT(RND(1) * 3)
+                SELECT CASE num
+                    CASE 1
+                        IF castlesLeft = 0 THEN EXIT SELECT 'innkeeper only tells known castles
+                        num = INT(RND(1) * castlesLeft + 1)
+                        PRINT "The innkeeper told of a legend of a castle ";
+                        CALL WHERE_IS_IT(castle(num).coords, player.coords)
+                        GOTO WHERE_TO
+                    CASE 2
+                        GOTO WHERE_TO
+                END SELECT
+                num = INT(RND(1) * 4 + 1)
+                PRINT "The innkeeper told you that the forest edge is less than"
+                SELECT CASE num
+                    CASE 1
+                        PRINT INT(player.coords.y / 10) * 10 + 10; "yards to the north."
+                    CASE 2
+                        PRINT INT((100 - player.coords.y) / 10) * 10 + 10; "yards to the south."
+                    CASE 3
+                        PRINT INT(player.coords.x / 10) * 10 + 10; "yards to the west."
+                    CASE 4
+                        PRINT INT((100 - player.coords.x) / 10) * 10 + 10; "yards to the east."
+                END SELECT
+                GOTO WHERE_TO
+
+            END IF
+            player.coords.x = newCoords.x
+            player.coords.y = newCoords.y
+        ELSE
+            PRINT "Your time's up. 30 days have passed."
+            SLEEP 1
+            GOTO GIANT_EAGLE
+        END IF
+
+    LOOP
+    IF exitForest = 1 THEN EXIT DO
+LOOP
+SLEEP 3.75
+CLS
+
+PRINT "You survived the forest!"
+SLEEP 1
+INPUT "Do you wish to see the number of monsters you killed, ran from, and bribed?"; X$
+
+IF UCASE$(X$) = "N" THEN
+    PRINT
+ELSE
+    PRINT "MONSTER"; TAB(11); "NO. SLAIN"; TAB(32); "MONSTER"; TAB(43); "NO. SLAIN"
+    FOR i = 1 TO monsterCount / 2
+        PRINT monster(i).name; TAB(14); numbers(i); TAB(32); monster(monsterCount / 2 + monsterCount MOD 2 + i).name;
+        PRINT TAB(46); numbers(i + 6)
+    NEXT
+    IF monsterCount MOD 2 = 1 THEN PRINT TAB(32); monster(monsterCount / 2 + 1).name, TAB(46); numbers(13)
+    PRINT
+    PRINT "BRIBED-"; bribeCt; TAB(32); "RAN FROM"; runCt
+END IF
+PRINT TAB(10); "TREASURE TOTAL-"; player.treasure.gp
+IF treasurePointsPrev <> 0 THEN
+    IF treasurePointsPrev < player.treasure.gp THEN PRINT "You won more treasure this time than before."
+    IF treasurePointsPrev > player.treasure.gp THEN PRINT "You didn't obtain as much treasure this time."
+END IF
+PRINT "Congratulations";
+IF treasurePointsPrev <> 0 AND treasurePointsPrev > player.treasure.gp THEN
+    PRINT " anyway"
+    PRINT
+END IF
+PRINT
+X$ = ""
+IF daysInForest < 30 THEN INPUT "Do you wish to return to the forest"; X$
+daysInForest = 0
+sleepRemaining = sleepMax
+invisibilityRemaining = invisibilityMax
+charmsRemaining = charmsMax
+combatS = maxCombatStrength
+IF UCASE$(X$) <> "Y" THEN
+    SLEEP 2
+    PRINT
+    INPUT "Do you wish to go to a new forest with the same strength and magic?"; X$
+    IF UCASE$(X$) = "Y" THEN GOTO INITIALIZE
+    INPUT "Do you wish to go to a new forest with a new strength and magic?"; X$
+    IF UCASE$(X$) = "Y" THEN RUN
+    INPUT "Do you want to see your strength and magic so you can record it?"; X$
+    IF UCASE$(X$) = "Y" THEN
+        PRINT "COMBAT STRENGTH-"; maxCombatStrength
+        PRINT "SLEEP SPELLS-"; sleepMax
+        PRINT "CHARMS-"; charmsMax
+        PRINT "INVISIBILITY-"; invisibilityMax
+        PRINT
+    END IF
+    PRINT
+    PRINT "Once again, your Treasure Total was"; player.treasure.gp
+    IF player.treasure.gp > treasurePointsPrev THEN treasurePointsPrev = player.treasure.gp
+    IF treasurePointsPrev <> 0 THEN PRINT "The largest Treasure Total you got with this strength and magic was"; treasurePointsPrev
+    END
+END IF
+CLS
+GOTO RANDOM_LOC
+
+DISPLACEMENT:
+newCoords = player.coords
+k = 0
+tracker = 0
+DO
+    player.coords.x = newCoords.x + rollD(1, 3) - 2
+    player.coords.y = newCoords.y + rollD(1, 3) - 2
+    IF player.coords.x = newCoords.x AND player.coords.y = newCoords.y THEN _CONTINUE
+    daysInForest = daysInForest + .1
+LOOP WHILE world(player.coords.x, player.coords.y) > 1 AND k = 0
+IF num <> 11 THEN runCt = runCt + 1
+GOTO CHECK_MAP
+
+SUB WHERE_IS_IT (castleCoords AS Coordinates, myCoords AS Coordinates):
+    IF ABS(castleCoords.x - myCoords.x) < 5 AND ABS(castleCoords.y - myCoords.y) < 5 THEN
+        PRINT "very close by."
+        RETURN
+    END IF
+    num2 = myCoords.x - castleCoords.x
+    num = myCoords.y - castleCoords.y
+    IF ABS(ABS(num) - ABS(num2)) < 5 THEN
+        PRINT "directly to the ";
+    ELSE
+        PRINT "somewhere to the ";
+    END IF
+    SELECT CASE num
+        CASE IS < 0
+            PRINT "south";
+        CASE IS > 0
+            PRINT "north";
+    END SELECT
+    SELECT CASE num2
+        CASE IS > 0
+            PRINT "west.";
+        CASE IS < 0
+            PRINT "east.";
+        CASE ELSE
+            PRINT ".";
+    END SELECT
+    PRINT
+END SUB
+
+
+
+SUB COMPELLED
+    PRINT "You must fight."
+END SUB
+
+SUB DEFEATED_BY (monster AS Entity, colors() AS LONG)
+    PRINT "The "; colored(monster, colors());
+    COLOR colors(15)
+    PRINT " killed you. ";
+    LOSS
+END SUB
+
+SUB LOSS
+    INPUT "You lose everything! Wish to try again?"; X$
+    PRINT
+    IF UCASE$(X$) = "Y" THEN EXIT SUB
+    PRINT
+    PRINT "So long... Better luck next time!"
+    END
+END SUB
+
+
+FUNCTION colored$ (e AS Entity, colors() AS LONG)
+    COLOR colors(e.color)
+    colored$ = "" + e.name
+END FUNCTION
+
+FUNCTION playerLevel% (experiencePoints AS LONG)
+    SELECT CASE experiencePoints
+        CASE IS < 300
+            playerLevel = 1
+        CASE IS < 900
+            playerLevel = 2
+        CASE IS < 2700
+            playerLevel = 3
+        CASE IS < 6500
+            playerLevel = 4
+        CASE IS < 14000
+            playerLevel = 5
+        CASE IS < 23000
+            playerLevel = 6
+        CASE IS < 34000
+            playerLevel = 7
+        CASE IS < 48000
+            playerLevel = 8
+        CASE IS < 64000
+            playerLevel = 9
+        CASE IS < 85000
+            playerLevel = 10
+        CASE IS < 100000
+            playerLevel = 11
+        CASE IS < 120000
+            playerLevel = 12
+        CASE IS < 140000
+            playerLevel = 13
+        CASE IS < 165000
+            playerLevel = 14
+        CASE IS < 195000
+            playerLevel = 15
+        CASE IS < 225000
+            playerLevel = 16
+        CASE IS < 265000
+            playerLevel = 17
+        CASE IS < 305000
+            playerLevel = 18
+        CASE IS < 355000
+            playerLevel = 19
+        CASE IS >= 355000
+            playerLevel = 20
+    END SELECT
+END FUNCTION
+
+FUNCTION appropriateChallenge% (characterLevel, encounterDifficulty)
+    SELECT CASE encounterDifficulty
+        CASE EASY
+            SELECT CASE characterLevel
+                CASE 1
+                    appropriateChallenge = 25
+                CASE 2
+                    appropriateChallenge = 50
+                CASE 3
+                    appropriateChallenge = 75
+                CASE 4
+                    appropriateChallenge = 125
+                CASE 5
+                    appropriateChallenge = 250
+                CASE 6
+                    appropriateChallenge = 500
+                CASE 7
+                    appropriateChallenge = 350
+                CASE 8
+                    appropriateChallenge = 450
+                CASE 9
+                    appropriateChallenge = 550
+                CASE 10
+                    appropriateChallenge = 600
+                CASE 11
+                    appropriateChallenge = 800
+                CASE 12
+                    appropriateChallenge = 1000
+                CASE 13
+                    appropriateChallenge = 1100
+                CASE 14
+                    appropriateChallenge = 1250
+                CASE 15
+                    appropriateChallenge = 1400
+                CASE 16
+                    appropriateChallenge = 1600
+                CASE 17
+                    appropriateChallenge = 2000
+                CASE 18
+                    appropriateChallenge = 2100
+                CASE 19
+                    appropriateChallenge = 2400
+                CASE 20
+                    appropriateChallenge = 2800
+            END SELECT
+        CASE MEDIUM
+            SELECT CASE characterLevel
+                CASE 1
+                    appropriateChallenge = 50
+                CASE 2
+                    appropriateChallenge = 100
+                CASE 3
+                    appropriateChallenge = 150
+                CASE 4
+                    appropriateChallenge = 250
+                CASE 5
+                    appropriateChallenge = 500
+                CASE 6
+                    appropriateChallenge = 600
+                CASE 7
+                    appropriateChallenge = 750
+                CASE 8
+                    appropriateChallenge = 900
+                CASE 9
+                    appropriateChallenge = 1100
+                CASE 10
+                    appropriateChallenge = 1200
+                CASE 11
+                    appropriateChallenge = 1600
+                CASE 12
+                    appropriateChallenge = 2000
+                CASE 13
+                    appropriateChallenge = 2200
+                CASE 14
+                    appropriateChallenge = 2500
+                CASE 15
+                    appropriateChallenge = 2800
+                CASE 16
+                    appropriateChallenge = 3200
+                CASE 17
+                    appropriateChallenge = 3900
+                CASE 18
+                    appropriateChallenge = 4200
+                CASE 19
+                    appropriateChallenge = 4900
+                CASE 20
+                    appropriateChallenge = 5700
+            END SELECT
+        CASE HARD
+            SELECT CASE characterLevel
+                CASE 1
+                    appropriateChallenge = 75
+                CASE 2
+                    appropriateChallenge = 150
+                CASE 3
+                    appropriateChallenge = 225
+                CASE 4
+                    appropriateChallenge = 375
+                CASE 5
+                    appropriateChallenge = 750
+                CASE 6
+                    appropriateChallenge = 900
+                CASE 7
+                    appropriateChallenge = 1100
+                CASE 8
+                    appropriateChallenge = 1400
+                CASE 9
+                    appropriateChallenge = 1600
+                CASE 10
+                    appropriateChallenge = 1900
+                CASE 11
+                    appropriateChallenge = 2400
+                CASE 12
+                    appropriateChallenge = 3000
+                CASE 13
+                    appropriateChallenge = 3400
+                CASE 14
+                    appropriateChallenge = 3800
+                CASE 15
+                    appropriateChallenge = 4300
+                CASE 16
+                    appropriateChallenge = 4800
+                CASE 17
+                    appropriateChallenge = 5900
+                CASE 18
+                    appropriateChallenge = 6300
+                CASE 19
+                    appropriateChallenge = 7300
+                CASE 20
+                    appropriateChallenge = 8500
+            END SELECT
+        CASE DEADLY
+            SELECT CASE characterLevel
+                CASE 1
+                    appropriateChallenge = 100
+                CASE 2
+                    appropriateChallenge = 200
+                CASE 3
+                    appropriateChallenge = 400
+                CASE 4
+                    appropriateChallenge = 500
+                CASE 5
+                    appropriateChallenge = 1100
+                CASE 6
+                    appropriateChallenge = 1400
+                CASE 7
+                    appropriateChallenge = 1700
+                CASE 8
+                    appropriateChallenge = 2100
+                CASE 9
+                    appropriateChallenge = 2400
+                CASE 10
+                    appropriateChallenge = 2800
+                CASE 11
+                    appropriateChallenge = 3600
+                CASE 12
+                    appropriateChallenge = 4500
+                CASE 13
+                    appropriateChallenge = 5100
+                CASE 14
+                    appropriateChallenge = 5700
+                CASE 15
+                    appropriateChallenge = 6400
+                CASE 16
+                    appropriateChallenge = 7200
+                CASE 17
+                    appropriateChallenge = 8800
+                CASE 18
+                    appropriateChallenge = 9500
+                CASE 19
+                    appropriateChallenge = 10900
+                CASE 20
+                    appropriateChallenge = 12700
+            END SELECT
+    END SELECT
+END FUNCTION
+
+FUNCTION xp&& (cr, numberOfMonsters)
+    DIM x AS LONG
+    SELECT CASE numberOfMonsters
+        CASE 1
+            multiplier = 1
+        CASE 2
+            multiplier = 1.5
+        CASE 3 TO 6
+            multiplier = 2
+        CASE 7 TO 10
+            multiplier = 2.5
+        CASE 11 TO 14
+            multiplier = 3
+        CASE IS >= 15
+            multiplier = 4
+    END SELECT
+    SELECT CASE cr
+        CASE 0
+            x = 10
+        CASE 1 / 8
+            x = 25
+        CASE 1 / 4
+            x = 50
+        CASE 1 / 2
+            x = 100
+        CASE 1
+            x = 200
+        CASE 2
+            x = 450
+        CASE 3
+            x = 700
+        CASE 4
+            x = 1100
+        CASE 5
+            x = 1800
+        CASE 6
+            x = 2300
+        CASE 7
+            x = 2900
+        CASE 8
+            x = 3900
+        CASE 9
+            x = 5000
+        CASE 10
+            x = 5900
+        CASE 11
+            x = 7200
+        CASE 12
+            x = 8400
+        CASE 13
+            x = 10000
+        CASE 14
+            x = 11500
+        CASE 15
+            x = 13000
+        CASE 16
+            x = 15000
+        CASE 17
+            x = 18000
+        CASE 18
+            x = 20000
+        CASE 19
+            x = 20000
+        CASE 20
+            x = 25000
+        CASE 21
+            x = 33000
+        CASE 22
+            x = 41000
+        CASE 23
+            x = 50000
+        CASE 24
+            x = 62000
+        CASE 25
+            x = 75000
+        CASE 26
+            x = 90000
+        CASE 27
+            x = 105000
+        CASE 28
+            x = 120000
+        CASE 29
+            x = 135000
+        CASE 30
+            x = 155000
+    END SELECT
+    xp = x * multiplier
+END FUNCTION
+
+FUNCTION getWorth# (currency AS Currency)
+    getWorth = currency.cp * .01 + currency.sp * .1 + currency.ep * .5 + currency.gp + currency.pp * 10
+END FUNCTION
+
+FUNCTION getWeightCarried# (entity AS Entity)
+    getWeightCarried = (entity.coins.cp + entity.coins.sp + entity.coins.ep + entity.coins.gp + entity.coins.pp + entity.treasure.cp + entity.treasure.sp + entity.treasure.ep + entity.treasure.gp + entity.treasure.pp) / 50
+END FUNCTION
+
+FUNCTION getEncumbrance%% (entity AS Entity)
+    carriedWeight = getWeightCarried(entity)
+    IF carriedWeight < entity.abilities.str * 5 THEN getEncumbrance = 0
+    IF carriedWeight < entity.abilities.str * 10 THEN getEncumbrance = 5
+    IF carriedWeight < entity.abilities.str * 15 THEN getEncumbrance = 10
+    getEncumbrance = 15
+END FUNCTION
+
+FUNCTION rollD% (quantity, sides) 'in: number of sides on die. out: total result
+    FOR i = 1 TO quantity
+        total = total + INT(RND * sides) + 1
+    NEXT
+    rollD = total
+END FUNCTION
+
+FUNCTION check` (ability, target)
+    IF rollD(1, 20) + modifier(ability) < target THEN
+        check = 1
+        PRINT "hit";
+    ELSE
+        check = 0
+        PRINT "miss";
+    END IF
+END FUNCTION
+
+FUNCTION ac%% (entity AS Entity)
+    ac = 10 + modifier(entity.abilities.dex)
+END FUNCTION
+
+FUNCTION modifier%% (ability)
+    modifier = INT(ability / 2) - 5
+END FUNCTION
+
+FUNCTION generateTreasure# (cr)
+    SELECT CASE cr
+        CASE 0 TO 4
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 30
+                    cp = rollD(5, 6)
+                CASE 31 TO 60
+                    sp = rollD(4, 6)
+                CASE 61 TO 70
+                    ep = rollD(3, 6)
+                CASE 71 TO 95
+                    gp = rollD(3, 6)
+                CASE 96 TO 100
+                    pp = rollD(1, 6)
+            END SELECT
+        CASE 5 - 10
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 30
+                    cp = rollD(4, 6) * 100
+                    ep = rollD(1, 6) * 35
+                CASE 31 TO 60
+                    sp = rollD(6, 6) * 10
+                    gp = rollD(2, 6) * 10
+                CASE 61 TO 70
+                    ep = rollD(3, 6) * 10
+                    gp = rollD(2, 6) * 10
+                CASE 71 TO 95
+                    gp = rollD(4, 6) * 10
+                CASE 96 TO 100
+                    gp = rollD(2, 10) * 10
+                    pp = rollD(3, 6)
+            END SELECT
+        CASE 11 TO 16
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 20
+                    sp = rollD(4, 6) * 100
+                    gp = rollD(1, 6) * 100
+                CASE 21 TO 35
+                    ep = rollD(1, 6) * 100
+                    gp = rollD(1, 6) * 100
+                CASE 36 TO 75
+                    gp = rollD(2, 6) * 100
+                    pp = rollD(1, 6) * 10
+                CASE 76 TO 100
+                    gp = rollD(2, 6) * 100
+                    pp = rollD(2, 6) * 10
+            END SELECT
+        CASE IS >= 17
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 15
+                    ep = rollD(2, 6) * 1000
+                    gp = rollD(8, 6) * 100
+                CASE 16 TO 55
+                    gp = rollD(1, 6) * 1000
+                    pp = rollD(1, 6) * 100
+                CASE 56 TO 100
+                    gp = rollD(1, 6) * 1000
+                    pp = rollD(2, 6) * 100
+            END SELECT
+    END SELECT
+    generateTreasure = .01 * cp + .1 * sp + .5 * ep + gp + 10 * pp
+END FUNCTION
+
+FUNCTION generateTreasureHoardCoins# (cr)
+    SELECT CASE cr
+        CASE 0 TO 4
+            cp = rollD(6, 6) * 100
+            sp = rollD(3, 6) * 100
+            gp = rollD(2, 6) * 10
+        CASE 5 TO 10
+            cp = rollD(2, 6) * 100
+            sp = rollD(2, 6) * 1000
+            gp = rollD(6, 6) * 100
+            pp = rollD(3, 6) * 10
+        CASE 11 TO 16
+            gp = rollD(4, 6) * 1000
+            pp = rollD(5, 6) * 100
+        CASE IS >= 17
+            gp = rollD(12, 6) * 1000
+            pp = rollD(8, 6) * 1000
+    END SELECT
+    generateTreasureHoardCoins = .01 * cp + .1 * sp + .5 * ep + gp + 10 * pp
+END FUNCTION
+
+FUNCTION generateTreasureHoardObjects# (cr)
+    SELECT CASE cr
+        CASE 0 TO 4
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 6
+                    PRINT "nothing!"
+                CASE 7 TO 16
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 10
+                        PRINT "a 10 gp gem"
+                    NEXT
+                CASE 17 TO 26
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                CASE 27 TO 36
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                CASE 37 TO 44
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 10
+                        PRINT "a 10 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item A"
+                    NEXT
+                CASE 45 TO 52
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item A"
+                    NEXT
+                CASE 53 TO 60
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item a"
+                    NEXT
+                CASE 61 TO 65
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 10
+                        PRINT "a 10 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 66 TO 70
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 71 TO 75
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 76 TO 78
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 10
+                        PRINT "a 10 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 79 TO 80
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 81 TO 85
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 86 TO 92
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 93 TO 97
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 98 TO 99
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    PRINT "a magic item g"
+                CASE 100
+                    FOR i = 1 TO rollD(2, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    PRINT "a magic item g"
+            END SELECT
+        CASE 5 - 10
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 4
+                    PRINT "nothing!"
+                CASE 5 TO 10
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                CASE 11 TO 16
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                CASE 17 TO 22
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                CASE 23 TO 28
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                CASE 29 TO 32
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item A"
+                    NEXT
+                CASE 33 TO 36
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item a"
+                    NEXT
+                CASE 37 TO 40
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item a"
+                    NEXT
+                CASE 41 TO 44
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item a"
+                    NEXT
+                CASE 45 TO 49
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 50 TO 54
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 55 TO 59
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 60 TO 63
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 64 TO 66
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 67 TO 69
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 70 TO 72
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 73 TO 74
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 75 TO 76
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    PRINT "a magic item d"
+                CASE 77 TO 78
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    PRINT "a magic item d"
+                CASE 79
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    PRINT "a magic item d"
+                CASE 80
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    PRINT "a magic item d"
+                CASE 81 TO 84
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 25
+                        PRINT "a 25 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 85 TO 88
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 50
+                        PRINT "a 50 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 89 TO 91
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 92 TO 94
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item f"
+                    NEXT
+                CASE 95 TO 96
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 97 TO 98
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 99
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 100
+                        PRINT "a 100 gp gem"
+                    NEXT
+                    PRINT "a magic item h"
+                CASE 100
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    PRINT "a magic item h"
+            END SELECT
+        CASE 11 - 16
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 3
+                    PRINT "nothing!"
+                CASE 4 TO 6
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                CASE 7 TO 9
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                CASE 10 TO 12
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                CASE 13 TO 15
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                CASE 16 TO 19
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item A"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 20 TO 23
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item A"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 24 TO 26
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item A"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 27 TO 29
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item A"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item b"
+                    NEXT
+                CASE 30 TO 35
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 36 TO 40
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 41 TO 45
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 46 TO 50
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 51 TO 54
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 55 TO 58
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 59 TO 62
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 63 TO 66
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 67 TO 68
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    PRINT "a magic item e"
+                CASE 69 TO 70
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    PRINT "a magic item e"
+                CASE 71 TO 72
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    PRINT "a magic item e"
+                CASE 73 TO 74
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    PRINT "a magic item e"
+                CASE 75 TO 76
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    PRINT "a magic item f"
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 77 TO 78
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    PRINT "a magic item f"
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 79 TO 80
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    PRINT "a magic item f"
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 81 TO 82
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    PRINT "a magic item f"
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 83 TO 85
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 86 TO 88
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 89 TO 90
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 91 TO 92
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 93 TO 94
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 250
+                        PRINT "a 250 gp art object"
+                    NEXT
+                    PRINT "a magic item i"
+                CASE 95 TO 96
+                    FOR i = 1 TO rollD(2, 4)
+                        gp = gp + 750
+                        PRINT "a 750 gp art object"
+                    NEXT
+                    PRINT "a magic item i"
+                CASE 97 TO 98
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 500
+                        PRINT "a 500 gp gem"
+                    NEXT
+                    PRINT "a magic item i"
+                CASE 99 TO 100
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gem"
+                    NEXT
+                    PRINT "a magic item i"
+            END SELECT
+        CASE IS >= 17
+            SELECT CASE rollD(1, 100)
+                CASE 1 TO 2
+                    PRINT "nothing!"
+                CASE 3 TO 5
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 8)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 6 TO 8
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 8)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 9 TO 11
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 8)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 12 TO 14
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 8)
+                        PRINT "a magic item c"
+                    NEXT
+                CASE 15 TO 22
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 23 TO 30
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 31 TO 38
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 39 TO 46
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item d"
+                    NEXT
+                CASE 47 TO 52
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item e"
+                    NEXT
+                CASE 53 TO 58
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item e"
+                    NEXT
+                CASE 59 TO 63
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item e"
+                    NEXT
+                CASE 64 TO 68
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 6)
+                        PRINT "a magic item e"
+                    NEXT
+                CASE 69
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 70
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 71
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 72
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item g"
+                    NEXT
+                CASE 73 TO 74
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 75 TO 76
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 77 TO 78
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 79 TO 80
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item h"
+                    NEXT
+                CASE 81 TO 85
+                    FOR i = 1 TO rollD(3, 6)
+                        gp = gp + 1000
+                        PRINT "a 1000 gp gems"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item i"
+                    NEXT
+                CASE 86 TO 90
+                    FOR i = 1 TO rollD(1, 10)
+                        gp = gp + 2500
+                        PRINT "a 2500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item i"
+                    NEXT
+                CASE 91 TO 95
+                    FOR i = 1 TO rollD(1, 4)
+                        gp = gp + 7500
+                        PRINT "a 7500 gp art object"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item i"
+                    NEXT
+                CASE 96 TO 100
+                    FOR i = 1 TO rollD(1, 8)
+                        gp = gp + 5000
+                        PRINT "a 5000 gp gem"
+                    NEXT
+                    FOR i = 1 TO rollD(1, 4)
+                        PRINT "a magic item i"
+                    NEXT
+            END SELECT
+    END SELECT
+    generateTreasureHoardObjects = .01 * cp + .1 * sp + .5 * ep + gp + 10 * pp
+END FUNCTION
+
+'all this is from the DMG
+'magic item table a
+DATA potion of healing,cantrip spell scroll,potion of climbing
+DATA 1st level spell scroll,2nd level spell scroll,greater potion of healing
+DATA bag of holding,driftglobe
+'b
+DATA greater potion of healing,potion of fire breath,potion of resistance
+DATA +1 ammunition,potion of animal friendship,potion of hill giant strength
+DATA potion of growth,potion of water breathing,2nd level spell scroll
+DATA 3rd level spell scroll,bag of holding,"Keoghtom's ointment"
+DATA oil of slipperiness,dust of disappearance,dust of dryness
+DATA dust of sneezing and choking,elemental gem,philter of love,alchemy jug
+DATA cap of water breathing,cloak of the manta ray,driftglobe
+DATA goggles of night,helm of comprehending languages,immovable rod
+DATA lantern of revealing,"mariner's armor",mithral armor,potion of poison
+DATA ring of swimming,robe of useful items,rope of climbing
+DATA saddle of the cavalier,wand of magic detection,wand of secrets
+'c
+DATA superior potion of healing,4th level spell scroll,+2 ammunition
+DATA potion of clairvoyance,potion of diminution,potion of gaseous form
+DATA potion of frost giant strength,potion of stone giant strength
+DATA potion of heroism,potion of invulnerability,potion of mind reading
+DATA 5th level spell scroll,elixir of health,oil of etherealness
+DATA potion of fire giant strength,"Quaal's feather token"
+DATA scroll of protection,bag of beans,bead of force,chime of opening
+DATA decanter of endless water,eyes of minute seeing,folding boat
+DATA "Heward's handy haversack",horseshoes of speed,necklace of fireballs
+DATA periapt of health,sending stones
+'d
+DATA supreme potion of healing,potion of invisibility,potion of speed
+DATA 6th level spell scroll,7th level spell scroll,+3 ammunition
+DATA oil of sharpness,potion of flying,potion of cloud giant strength
+DATA potion of longevity,potion of vitality,8th level spell scroll
+DATA horseshoes of a zephyr,"Nolzur's marvelous pigments",bag of devouring
+DATA portable hole
+'e
+DATA 8th level spell scroll,potion of storm giant strength
+DATA supreme potion of healing,9th level spell scroll,universal solvent
+DATA arrow of slaying,sovereign glue
+'f
+DATA +1 weapon,+1 shield,sentinel shield
+DATA amulet of proof against detectn & locatn,boots of elvenkind
+DATA boots of striding and springing,bracers of archery,brooch of shielding
+DATA broom of flying,cloak of elvenkind,cloak of protection
+DATA gauntlets of ogre power,hat of disguise,javelin of lightning
+DATA pearl of power,+1 rod of the pact keeper,slippers of spider climbing
+DATA staff of the adder,staff of the python,sword of vengeance
+DATA trident of fish command,wand of magic missiles,+1 wand of the war mage
+DATA wand of web,weapon of warning,adamantine chain mail
+DATA adamantine chain shirt,adamantine scale mail,gray bag of tricks
+DATA rust bag of tricks,tan bag of tricks,boots of the winterlands
+DATA circlet of blasting,deck of illusions,eversmoking bottle
+DATA eyes of charming,eyes of the eagle,silver raven,gem of brightness
+DATA gloves of missle snaring,gloves of swimming and climbing
+DATA gloves of thievery,headband of intellect,helm of telepathy,Doss lute
+DATA Fochlucan bandore,Mac-Fuirmidh cittern,medallion of thoughts
+DATA necklace of adaptation,periapt of wound closure,pipes of haunting
+DATA pipes of the sewers,ring of jumping,ring of mind shielding
+DATA ring of warmth,ring of water walking,quiver of Ehlonna,luckstone
+DATA wind fan,winged boots
+'g
+DATA +2 weapon,bronze griffon,ebony fly,golden lions,ivory goats
+DATA marble elephant,onyx dog,serpentine owl,adamantine breastplate
+DATA adamantine splint,amulet of health,armor of vulnerability
+DATA arrow-catching shield,belt of dwarvenkind,belt of hill giant strength
+DATA berserker axe,boots of levitation,boots of speed
+DATA bowl of commanding water elementals,bracers of defense
+DATA brazier of commanding fire elementals,cape of the mountebank
+DATA censer of controlling air elementals,+1 chain mail
+DATA chain mail of resistance,+1 chain shirt,chain shirt of resistance
+DATA cloak of displacement,cloak of the bat,cube of force
+DATA "Daern's instant fortress",dagger of venom,dimensional shackles
+DATA dragon slayer,elven chain,flame tongue,gem of seeing,giant slayer
+DATA glamoured studded leather,helm of teleportation,horn of blasting
+DATA silver horn of Valhalla,brass horn of Valhalla,Canaith mandolin
+DATA Cli lyre,Ioun stone of awareness,Ioun stone of protection
+DATA Ioun stone of reserve,Ioun stone of sustenance,iron hands of Bilarro
+DATA +1 leather,leather of resistance,mace of disruption,mace of smiting
+DATA mace of terror,mantle of spell resistance,necklace of prayer beads
+DATA periapt of proof against poison,ring of animal influence
+DATA ring of evasion,ring of feather falling,ring of free action
+DATA ring of protection,ring of resistance,ring of spell storing
+DATA ring of the ram,ring of X-ray vision,robe of eyes,rod of rulership
+DATA +2 rod of the pact keeper,rope of entanglement,+1 scale mail
+DATA scale mail of resistance,+2 shield,shield of missile attraction
+DATA staff of charming,staff of healing,staff of swarming insects
+DATA staff of the woodlands,staff of withering
+DATA stone of controlling earth elementals,sun blade
+DATA sword of life stealing,sword of wounding,tentacle rod,vicious weapon
+DATA wanding of binding,wand of enemy detection,wand of fear
+DATA wand of fireballs,wand of lightning bolts,wand of paralysis
+DATA +2 wand of the war mage,wand of wonder,wings of flying
+'h
+DATA +3 weapon,amulet of the planes,carpet of flying,very rare crystal ball
+DATA ring of regeneration,ring of shooting stars,ring of telekinesis
+DATA ring of scintillating colors,robe of stars,rod of absorption
+DATA ring of alertness,rod of security,+3 rod of the pact keeper
+DATA scimitar of speed,+3 shield,staff of fire,staff of frost,staff of power
+DATA staff of striking,staff of thunder and lightning,sword of sharpness
+DATA wand of polymorph,+3 wand of the war mage,adamantine half plate armor
+DATA adamantine plate armor,animated shield,belt of fire giant strength
+DATA belt of frost giant strength,belt of stone giant strength
+DATA +1 breastplate,breastplate of resistance,candle of invocation
+DATA +2 chain mail,+2 chain shirt,cloak of arachnida,dancing sword
+DATA demon armor,dragon scale mail,dwarven plate,dwarven thrower
+DATA efreeti bottle,obsidian steed,frost brand,helm of brilliance
+DATA bronze horn of Valhalla,Anstruth harp,Ioun stone of absorption
+DATA Ioun stone of agility,Ioun stone of fortitude,Ioun stone of insight
+DATA Ioun stone of intellect,Ioun stone of leadership,Ioun stone of strength
+DATA +2 leather,manual of bodily health,manual of gainful exercise
+DATA manual of golems,manual of quickness of action,mirror of life trapping
+DATA nine lives stealer,oathbow,+2 scale mail,spellguard shield
+DATA +1 splint,splint of resistance,+1 studded leather
+DATA studded leather of resistance,tome of clear thought
+DATA tome of leadership and influence,tome of understanding
+'i
+DATA defender,hammer of thunderbolts,luck blade,sword of answering
+DATA holy avenger,ring of djinni summoning,ring of invisibility
+DATA ring of spell turning,rod of lordly might,staff of the magi
+DATA vorpal sword,belt of cloud giant strength,+2 breastplate,+3 chain mail
+DATA +3 chain shirt,cloak of invisibility,legendary crystal ball
+DATA +1 half plate armor,iron flask,+3 leather,+1 plate armor
+DATA robe of the archmagi,rod of resurrection,+1 scale mail,scarab of protection,+2 splint
+DATA +2 studded leather,well of many worlds,+2 half plate armor
+DATA +2 plate armor,+3 studded leather,+3 breastplate,+3 splint
+DATA +3 half plate armor,+3 plate armor,apparatus of Kwalish
+DATA armor of invisibility,belt of storm giant strength,cubic gate
+DATA deck of many things,efreeti chain,half plate of resistance
+DATA iron horn of Valhalla,Ollamh harp,Ioun stone of greater absorption
+DATA Ioun stone of mastery,Ioun stone of regeneration
+DATA plate armor of resistance,ring of air elemental control
+DATA ring of earth elemental control,ring of fire elemental control
+DATA ring of three wishes,ring of water elemental command
+DATA sphere of annihilation,talisman of pure good,talisman of the sphere
+DATA talisman of ultimate evil,tome of the stilled tongue
+
