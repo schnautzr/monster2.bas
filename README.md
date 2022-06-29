@@ -1,4 +1,4 @@
-![Screenshot](https://raw.githubusercontent.com/schnautzr/monster2.bas/master/Screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/schnautzr/monster2.bas/master/img/Screenshot.png)
 
 IMPORTANT!!! Before first run, ensure that "Run > Output EXE to Source Folder" is selected. Otherwise you'll get a "File not found" error when you run.
 
