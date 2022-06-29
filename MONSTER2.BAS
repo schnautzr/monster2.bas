@@ -215,7 +215,7 @@ READ player.hitDice.ct, player.hitDice.sides
 
 file = 1
 i = 0
-OPEN "MONSTERS.CSV" FOR INPUT AS #file
+OPEN "monsters/MONSTERS.CSV" FOR INPUT AS #file
 DIM monster(1000) AS Entity
 DIM castle(15) AS Castle
 DIM currentMonster AS Entity
@@ -267,7 +267,7 @@ gemstoneValue(5) = 5000
 DIM gemCt(6) AS INTEGER
 FOR j = 0 TO 5
     file = file + 1
-    OPEN "GEM" + LTRIM$(STR$(gemstoneValue(j))) + ".CSV" FOR INPUT AS #file
+    OPEN "gemstones/GEM" + LTRIM$(STR$(gemstoneValue(j))) + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
@@ -292,7 +292,7 @@ jewelryValue(5) = 2000
 
 FOR j = 0 TO 5
     file = file + 1
-    OPEN "JWLR" + LTRIM$(STR$(jewelryValue(j))) + ".CSV" FOR INPUT AS #file
+    OPEN "jewelry/JWLR" + LTRIM$(STR$(jewelryValue(j))) + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
@@ -321,7 +321,7 @@ FOR j = 0 TO 4
         CASE LEGENDARY
             rarity$ = "L"
     END SELECT
-    OPEN "ART" + rarity$ + ".CSV" FOR INPUT AS #file
+    OPEN "art objects/ART" + rarity$ + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
