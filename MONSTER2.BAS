@@ -256,36 +256,6 @@ monsterCt = i
 CLOSE
 
 CHDIR ".."
-IF 1 = 0 THEN
-    OPEN "monsters/MONSTERS.CSV" FOR INPUT AS #file
-
-    DO UNTIL EOF(file)
-        i = i + 1
-        monster(i).id = i
-        INPUT #file, monster(i).name
-        INPUT #file, monster(i).plural
-        INPUT #file, monster(i).cr
-        INPUT #file, monster(i).color
-        INPUT #file, x
-        monster(i).disallowBribe = x / 1000 MOD 2
-        monster(i).disallowSleep = x / 100 MOD 2
-        monster(i).disallowCharm = x / 10 MOD 2
-        monster(i).disallowInvisibility = x MOD 2
-        SELECT CASE monster(i).name
-            CASE "mimic"
-                mimic = monster(i)
-            CASE "giant eagle"
-                giantEagle = monster(i)
-            CASE "giant bat"
-                giantBat = monster(i)
-                giantBat.speed = 12
-            CASE "basilisk"
-                basilisk = monster(i)
-        END SELECT
-    LOOP
-    monsterCt = i
-    CLOSE
-END IF
 
 DIM gemstone(6, 100) AS Gemstone
 DIM gemstoneValue(6)
