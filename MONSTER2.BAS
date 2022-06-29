@@ -213,9 +213,8 @@ DIM player AS Entity
 READ player.abilities.str, player.abilities.dex, player.abilities.con, player.abilities.int, player.abilities.wis, player.abilities.cha
 READ player.hitDice.ct, player.hitDice.sides
 
-file = 1
+file = 0
 i = 0
-OPEN "monsters/MONSTERS.CSV" FOR INPUT AS #file
 DIM monster(1000) AS Entity
 DIM castle(15) AS Castle
 DIM currentMonster AS Entity
@@ -227,19 +226,20 @@ DIM basilisk AS Entity
 
 pit.name = "pit"
 pit.color = 6
-
-DO UNTIL EOF(file)
+CHDIR ("monsters")
+file$ = DIR$("*.csv")
+DO
+    file$ = DIR$("") 'use an empty string parameter to return a list of files!
+    IF file$ = "" THEN EXIT DO
+    file = file + 1
+    OPEN file$ FOR INPUT AS #file
     i = i + 1
     monster(i).id = i
     INPUT #file, monster(i).name
     INPUT #file, monster(i).plural
     INPUT #file, monster(i).cr
     INPUT #file, monster(i).color
-    INPUT #file, x
-    monster(i).disallowBribe = x / 1000 MOD 2
-    monster(i).disallowSleep = x / 100 MOD 2
-    monster(i).disallowCharm = x / 10 MOD 2
-    monster(i).disallowInvisibility = x MOD 2
+    INPUT #file, monster(i).disallowBribe, monster(i).disallowSleep, monster(i).disallowCharm, monster(i).disallowInvisibility
     SELECT CASE monster(i).name
         CASE "mimic"
             mimic = monster(i)
@@ -254,6 +254,38 @@ DO UNTIL EOF(file)
 LOOP
 monsterCt = i
 CLOSE
+
+CHDIR ".."
+IF 1 = 0 THEN
+    OPEN "monsters/MONSTERS.CSV" FOR INPUT AS #file
+
+    DO UNTIL EOF(file)
+        i = i + 1
+        monster(i).id = i
+        INPUT #file, monster(i).name
+        INPUT #file, monster(i).plural
+        INPUT #file, monster(i).cr
+        INPUT #file, monster(i).color
+        INPUT #file, x
+        monster(i).disallowBribe = x / 1000 MOD 2
+        monster(i).disallowSleep = x / 100 MOD 2
+        monster(i).disallowCharm = x / 10 MOD 2
+        monster(i).disallowInvisibility = x MOD 2
+        SELECT CASE monster(i).name
+            CASE "mimic"
+                mimic = monster(i)
+            CASE "giant eagle"
+                giantEagle = monster(i)
+            CASE "giant bat"
+                giantBat = monster(i)
+                giantBat.speed = 12
+            CASE "basilisk"
+                basilisk = monster(i)
+        END SELECT
+    LOOP
+    monsterCt = i
+    CLOSE
+END IF
 
 DIM gemstone(6, 100) AS Gemstone
 DIM gemstoneValue(6)
@@ -2571,3 +2603,29 @@ END FUNCTION
 FUNCTION modifier%% (ability)
     modifier = INT(ability / 2) - 5
 END FUNCTION
+
+FUNCTION DIR$ (spec$) '  Code by Ted Weissgerber
+    CONST TmpFile$ = "DIR$INF0.INF", ListMAX% = 500 'change maximum to suit your needs
+    SHARED DIRCount% 'returns file count if desired
+    STATIC Ready%, Index%, DirList$()
+    IF NOT Ready% THEN REDIM DirList$(ListMAX%): Ready% = -1 'DIM array first use
+    IF spec$ > "" THEN 'get file names when a spec is given
+        SHELL _HIDE "DIR " + spec$ + " /b > " + TmpFile$
+        Index% = 0: DirList$(Index%) = "": ff% = FREEFILE
+        OPEN TmpFile$ FOR APPEND AS #ff%
+        size& = LOF(ff%)
+        CLOSE #ff%
+        IF size& = 0 THEN KILL TmpFile$: EXIT FUNCTION
+        OPEN TmpFile$ FOR INPUT AS #ff%
+        DO WHILE NOT EOF(ff%) AND Index% < ListMAX%
+            Index% = Index% + 1
+            LINE INPUT #ff%, DirList$(Index%)
+        LOOP
+        DIRCount% = Index% 'SHARED variable can return the file count
+        CLOSE #ff%
+        KILL TmpFile$
+    ELSE IF Index% > 0 THEN Index% = Index% - 1 'no spec sends next file name
+    END IF
+    DIR$ = DirList$(Index%)
+END FUNCTION
+
