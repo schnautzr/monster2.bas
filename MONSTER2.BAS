@@ -1879,8 +1879,7 @@ DO
                 converted = 0
 
                 DIM charge AS DOUBLE
-                charge = INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)
-                charge = charge / 100
+                charge = CDBL(INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)) / 100
                 IF charge < 5 THEN
                     SELECT CASE (getWorth(player.treasure) + getWorth(player.coins))
                         CASE IS > 5
