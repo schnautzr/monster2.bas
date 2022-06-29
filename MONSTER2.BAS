@@ -25,7 +25,7 @@ colors(13) = &HFFFF55FF
 colors(14) = &HFFFFFF55
 colors(15) = &HFFFFFFFF
 
-'i = _LOADIMAGE("C:\Users\Rob\QBASIC\MONSTER\CASTLE.BMP", 32)
+'i = _LOADIMAGE("CASTLE.BMP", 32)
 '_PUTIMAGE (40, 80), i
 PRINT "*** MONSTER COMBAT"
 
@@ -215,7 +215,7 @@ READ player.hitDice.ct, player.hitDice.sides
 
 file = 1
 i = 0
-OPEN "C:\Users\Rob\QBASIC\MONSTER\MONSTERS.CSV" FOR INPUT AS #file
+OPEN "MONSTERS.CSV" FOR INPUT AS #file
 DIM monster(1000) AS Entity
 DIM castle(15) AS Castle
 DIM currentMonster AS Entity
@@ -267,7 +267,7 @@ gemstoneValue(5) = 5000
 DIM gemCt(6) AS INTEGER
 FOR j = 0 TO 5
     file = file + 1
-    OPEN "C:\Users\Rob\QBASIC\MONSTER\GEM" + LTRIM$(STR$(gemstoneValue(j))) + ".CSV" FOR INPUT AS #file
+    OPEN "GEM" + LTRIM$(STR$(gemstoneValue(j))) + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
@@ -292,7 +292,7 @@ jewelryValue(5) = 2000
 
 FOR j = 0 TO 5
     file = file + 1
-    OPEN "C:\Users\Rob\QBASIC\MONSTER\JWLR" + LTRIM$(STR$(jewelryValue(j))) + ".CSV" FOR INPUT AS #file
+    OPEN "JWLR" + LTRIM$(STR$(jewelryValue(j))) + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
@@ -321,7 +321,7 @@ FOR j = 0 TO 4
         CASE LEGENDARY
             rarity$ = "L"
     END SELECT
-    OPEN "C:\Users\Rob\QBASIC\MONSTER\ART" + rarity$ + ".CSV" FOR INPUT AS #file
+    OPEN "ART" + rarity$ + ".CSV" FOR INPUT AS #file
     i = 0
     DO UNTIL EOF(file)
         i = i + 1
