@@ -547,11 +547,12 @@ DO
                         CASE 1
                             PRINT "You stepped into a time warp and lost 7 days."
                             timeInForest = timeInForest + WEEK
+                            SLEEP 1
                         CASE 2
                             IF player.combatStrengthRemaining >= player.maxCombatStrength THEN EXIT SELECT
                             PRINT "You met an elf who gave you a magic drink that gave your Combat Strength back."
                             player.combatStrengthRemaining = player.maxCombatStrength
-
+                            SLEEP 1
                         CASE 3
                             num = rollD(1, 10) * DAY
                             num2 = timeInForest
@@ -561,26 +562,26 @@ DO
                                 num = num2 - timeInForest
                             END IF
                             PRINT "You stepped into a time warp and gained"; num; "days."
-
+                            SLEEP 1
                         CASE 4
                             IF player.invisibilityRemaining + player.charmsRemaining + player.sleepRemaining = player.invisibilityMax + player.charmsMax + player.sleepMax THEN EXIT SELECT
                             PRINT "You ran into a wizard who gave you a potion that restored all your magic."
                             player.invisibilityRemaining = player.invisibilityMax
                             player.charmsRemaining = player.charmsMax
                             player.sleepRemaining = player.sleepMax
-
+                            SLEEP 1
                         CASE 5
                             IF player.treasure.gp < 2 THEN EXIT SELECT
                             PRINT "You fell into some quicksand. You lost half of your"
                             PRINT "treasure."
                             player.treasure.gp = INT(player.treasure.gp / 2)
-
+                            SLEEP 1
                         CASE 6
                             PRINT "You ran into some thick underbrush and used up half"
                             PRINT "your strength."
                             player.combatStrengthRemaining = INT(player.combatStrengthRemaining / 2)
                             PRINT "Your Combat Strength is now "; player.combatStrengthRemaining
-
+                            SLEEP 1
                         CASE 7
                             num = INT(RND(1) * 50 + 1)
                             PRINT "You found"; num;
@@ -610,15 +611,15 @@ DO
                             COLOR colors(15)
                             PRINT " lying on the";
                             PRINT " ground and picked them up."
-
+                            SLEEP 1
                         CASE 8
                             IF mirror <> 7 THEN EXIT SELECT
                             PRINT "You tripped over some roots and lost your mirror."
                             mirror = 0
-
+                            SLEEP 1
                         CASE 9
                             PRINT "A hermit told you that there are"; castlesLeft; "castles left."
-
+                            SLEEP 1
                         CASE 10
                             IF player.invisibilityRemaining + player.sleepRemaining + player.charmsRemaining = 0 THEN EXIT SELECT
                             PRINT "You wandered into an area where magic fades."
@@ -626,14 +627,14 @@ DO
                             player.invisibilityRemaining = 0
                             player.sleepRemaining = 0
                             player.charmsRemaining = 0
-
+                            SLEEP 1
                         CASE 11
                             IF castlesLeft = 0 THEN EXIT SELECT
                             PRINT "You met a hunter who told you of the legend of a"
                             PRINT "castle ";
                             num = INT(RND(1) * castlesLeft) + 1
                             CALL WHERE_IS_IT(castle(num).coords, player.coords)
-
+                              sleep 1
                     END SELECT
                 END IF
                 IF event = NOTHING_THERE THEN
@@ -1607,7 +1608,14 @@ DO
                         LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
-                        PRINT "A "; colored(currentMonster, colors());
+                        startsWith$ = LEFT$(monster$, 1)
+                        SELECT CASE startsWith$
+                            CASE "a", "e", "i", "o", "u"
+                                PRINT "An ";
+                            CASE ELSE
+                                PRINT "A ";
+                        END SELECT
+                        PRINT colored(currentMonster, colors());
                         COLOR colors(15)
                         PRINT " heard the noise of the battle and came wandering by."
                         recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
@@ -1637,7 +1645,14 @@ DO
                         LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
-                        PRINT "A "; colored(currentMonster, colors());
+                        startsWith$ = LEFT$(monster$, 1)
+                        SELECT CASE startsWith$
+                            CASE "a", "e", "i", "o", "u"
+                                PRINT "An ";
+                            CASE ELSE
+                                PRINT "A ";
+                        END SELECT
+                        PRINT colored(currentMonster, colors());
                         COLOR colors(15)
                         PRINT " heard the noise of the battle and came wandering by."
                         recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
