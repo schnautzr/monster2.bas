@@ -554,14 +554,11 @@ DO
                             player.combatStrengthRemaining = player.maxCombatStrength
                             SLEEP 1
                         CASE 3
-                            num = rollD(1, 10) * DAY
-                            num2 = timeInForest
-                            timeInForest = timeInForest - num
-                            IF timeInForest < 1 THEN
-                                timeInForest = 1
-                                num = num2 - timeInForest
-                            END IF
-                            PRINT "You stepped into a time warp and gained"; num / days; "days."
+                            DO
+                                num = rollD(1, 10)
+                            LOOP UNTIL num * DAY < timeInForest
+                            timeInForest = timeInForest - num * DAY
+                            PRINT "You stepped into a time warp and gained"; num; "days."
                             SLEEP 1
                         CASE 4
                             IF player.invisibilityRemaining + player.charmsRemaining + player.sleepRemaining = player.invisibilityMax + player.charmsMax + player.sleepMax THEN EXIT SELECT
