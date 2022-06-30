@@ -78,7 +78,7 @@ NO_GUARDIAN = 100
 'num value
 SLEEP_SUCCESS = 3
 
-DIM timeInForest AS LONG
+DIM timeInForest AS DOUBLE
 
 TYPE Abilities
     str AS _BYTE
@@ -499,7 +499,7 @@ DO
                 CASE -1
                     PRINT "Money:";
                     COLOR colors(6)
-                    PRINT TAB(40); "þ"; player.coins.cp;
+                    PRINT TAB(41); "þ"; player.coins.cp;
                     COLOR colors(7)
                     PRINT ""; player.coins.sp;
                     COLOR colors(9)
@@ -511,7 +511,7 @@ DO
                 CASE 0
                     PRINT "Value-";
                     COLOR colors(14)
-                    PRINT TAB(55); getWorth(player.coins); "gp"
+                    PRINT TAB(52); getWorth(player.coins); "gp"
                 CASE 1
                     PRINT "Magic:"
                 CASE 2
@@ -525,7 +525,7 @@ DO
                     PRINT TAB(40); player.invisibilityRemaining
                 CASE 5
                     PRINT "Time in the Forest-";
-                    PRINT TAB(40); timeInForest; "seconds"
+                    PRINT TAB(40); getTime$(timeInForest)
                 CASE ELSE
                     PRINT
             END SELECT
@@ -2611,3 +2611,27 @@ FUNCTION DIR$ (spec$) '  Code by Ted Weissgerber
     DIR$ = DirList$(Index%)
 END FUNCTION
 
+FUNCTION getTime$ (t AS DOUBLE) 't is time in seconds
+    DIM s AS DOUBLE, m AS DOUBLE, h AS DOUBLE, d AS DOUBLE
+    t = CDBL(INT(t))
+    s = CDBL(INT(t) MOD 60)
+    m = CDBL(INT(t / 60) MOD 60)
+    h = CDBL(INT(t / 3600) MOD 24)
+    d = CDBL(INT(t / 86400))
+    s$ = ""
+    SELECT EVERYCASE 0
+        CASE IS < d
+            s$ = STR$(d) + " days"
+            IF h + m + s > 0 THEN s$ = s$ + ", "
+        CASE IS < h
+            s$ = s$ + STR$(h) + " hours"
+            IF m + s > 0 THEN s$ = s$ + ", "
+        CASE IS < m
+            IF m > 0 THEN s$ = s$ + STR$(m) + " minutes"
+            IF s > 0 THEN s$ = s$ + ", "
+        CASE IS < s
+            IF s > 0 THEN s$ = s$ + STR$(s) + " seconds"
+    END SELECT
+    IF s$ = "" THEN s$ = " 0 seconds"
+    getTime$ = s$
+END FUNCTION
