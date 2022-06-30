@@ -2546,7 +2546,7 @@ FUNCTION adjustedXp&& (numberOfMonsters, xPoints AS LONG)
 END FUNCTION
 
 FUNCTION getWorth# (currency AS Currency)
-    getWorth = currency.cp * .01 + currency.sp * .1 + currency.ep * .5 + currency.gp + currency.pp * 10
+    getWorth = CDBL(FIX((CDBL(currency.cp) * .01 + CDBL(currency.sp) * .1 + CDBL(currency.ep) * .5 + CDBL(currency.gp) + CDBL(currency.pp) * 10) * 100)) / 100
 END FUNCTION
 
 FUNCTION getWeightCarried# (entity AS Entity)
