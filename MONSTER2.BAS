@@ -634,7 +634,7 @@ DO
                             PRINT "castle ";
                             num = INT(RND(1) * castlesLeft) + 1
                             CALL WHERE_IS_IT(castle(num).coords, player.coords)
-                              sleep 1
+                            SLEEP 1
                     END SELECT
                 END IF
                 IF event = NOTHING_THERE THEN
@@ -1608,7 +1608,7 @@ DO
                         LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
-                        startsWith$ = LEFT$(monster$, 1)
+                        startsWith$ = LEFT$(currentMonster.name, 1)
                         SELECT CASE startsWith$
                             CASE "a", "e", "i", "o", "u"
                                 PRINT "An ";
@@ -1645,7 +1645,7 @@ DO
                         LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
-                        startsWith$ = LEFT$(monster$, 1)
+                        startsWith$ = LEFT$(currentMonster.name, 1)
                         SELECT CASE startsWith$
                             CASE "a", "e", "i", "o", "u"
                                 PRINT "An ";
