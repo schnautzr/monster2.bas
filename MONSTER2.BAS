@@ -569,13 +569,11 @@ DO
                             SLEEP 1
                         CASE 5
                             IF player.treasure.gp < 2 THEN EXIT SELECT
-                            PRINT "You fell into some quicksand. You lost half of your"
-                            PRINT "treasure."
+                            PRINT "You fell into some quicksand. You lost half of your treasure."
                             player.treasure.gp = INT(player.treasure.gp / 2)
                             SLEEP 1
                         CASE 6
-                            PRINT "You ran into some thick underbrush and used up half"
-                            PRINT "your strength."
+                            PRINT "You ran into some thick underbrush and used up half your strength."
                             player.combatStrengthRemaining = INT(player.combatStrengthRemaining / 2)
                             PRINT "Your Combat Strength is now "; player.combatStrengthRemaining
                             SLEEP 1
@@ -627,8 +625,7 @@ DO
                             SLEEP 1
                         CASE 11
                             IF castlesLeft = 0 THEN EXIT SELECT
-                            PRINT "You met a hunter who told you of the legend of a"
-                            PRINT "castle ";
+                            PRINT "You met a hunter who told you of the legend of a castle ";
                             num = INT(RND(1) * castlesLeft) + 1
                             CALL WHERE_IS_IT(castle(num).coords, player.coords)
                             SLEEP 1
@@ -950,9 +947,10 @@ DO
                                 mirror = 7
                             END IF
                             num2 = INT(RND(1) * 20)
-                            IF num2 = 2 THEN player.combatStrengthRemaining = 2 * player.combatStrengthRemaining
-                            IF num2 = 2 THEN PRINT "You also found an enchanted sword which doubles ";
-                            IF num2 = 2 THEN PRINT "your strength."
+                            IF num2 = 2 THEN
+                                player.combatStrengthRemaining = 2 * player.combatStrengthRemaining
+                                PRINT "You also found an enchanted sword which doubles your strength."
+                            END IF
                             FOR i = 1 TO castlesLeft - 1
                                 IF castle(i).coords.x = player.coords.x AND castle(i).coords.y = player.coords.y THEN
                                     FOR j = i TO castlesLeft - 1
@@ -1065,39 +1063,40 @@ DO
                             startsWith$ = LEFT$(monster$, 1)
                             SELECT CASE startsWith$
                                 CASE "a", "e", "i", "o", "u"
-                                    PRINT "An ";
+                                    CALL WordWrap("An ")
                                 CASE ELSE
-                                    PRINT "A ";
+                                    CALL WordWrap("A ")
                             END SELECT
                             PRINT colored(currentMonster, colors());
-                            PRINT USING " (Challenge Rating&)"; STR$(currentMonster.cr);
+                            CALL WordWrap(" (Challenge Rating" + STR$(currentMonster.cr) + ")")
                             COLOR colors(15)
-                            PRINT " is ";
+                            CALL WordWrap(" is ")
                         CASE IS <> 1
                             currentMonster.name = currentMonster.plural
                             PRINT howManyMonsters;
                             PRINT colored(currentMonster, colors());
-                            PRINT USING " (Challenge Rating&)"; STR$(currentMonster.cr);
+                            CALL WordWrap(" (Challenge Rating" + STR$(currentMonster.cr) + ")")
                             COLOR colors(15)
-                            PRINT " are ";
+                            CALL WordWrap(" are ")
                     END SELECT
-                    PRINT "guarding";
+                    CALL WordWrap("guarding")
                     monster = currentMonster.cr * howManyMonsters * 10
                     recommendedCombatStrength = INT(monster * 2 + getWeightCarried(player) / 100)
                 END IF
                 event = rollD(1, 14)
                 IF (event = 12 OR event = 13 OR event = PRIZE_IS_SPELL) AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
-                IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN PRINT "Nothing is guarding ";
+                IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN CALL WordWrap("Nothing is guarding ")
                 IF event > 11 THEN
                     IF event <> PRIZE_IS_SPELL THEN
-                        IF event > 11 THEN PRINT " nothing"
+                        IF event > 11 THEN CALL WordWrap(" nothing.")
                         points = 0
                     ELSE
                         guardedSpell = rollD(1, 3)
                         tracker = guardedSpell + 5 'SPELL_1_IS_GUARDED,SPELL_2_IS_GUARDED,SPELL_3_IS_GUARDED
                         COLOR colors(itemColor(guardedSpell))
-                        PRINT " "; items$(guardedSpell)
+                        CALL WordWrap(" " + items$(guardedSpell))
                         COLOR colors(15)
+                        PRINT
                         points = INT(RND(1) * 11)
                     END IF
                 ELSE
@@ -1107,7 +1106,7 @@ DO
                             roll = rollD(1, treasureCt)
                             currentTreasure = treasure(roll)
                             COLOR colors(currentTreasure.color)
-                            PRINT " "; currentTreasure.name;
+                            CALL WordWrap(" " + currentTreasure.name)
                             points = getWorth(currentTreasure.value)
                             SELECT CASE currentTreasure.id
                                 CASE sword.id
@@ -1181,7 +1180,7 @@ DO
                                 END SELECT
                             LOOP
                             COLOR colors(currentGemstone.color)
-                            PRINT " "; currentGemstone.name;
+                            CALL WordWrap(" " + currentGemstone.name)
                         CASE 3
                             table = rollD(1, 6) - 1
                             roll = rollD(1, jewelryCt(table))
@@ -1232,7 +1231,7 @@ DO
                                 END SELECT
                             LOOP WHILE roll = 1 AND points < 12000
                             COLOR colors(currentJewelry.color)
-                            PRINT " "; currentJewelry.name;
+                            CALL WordWrap(" " + currentJewelry.name)
                         CASE 4
                             money = NO_MONEY
                             FOR i = 1 TO howManyMonsters
@@ -1297,11 +1296,12 @@ DO
                                 END SELECT
                             NEXT
                             COLOR colors(14)
-                            PRINT getWorth(money); "gp"
+                            CALL WordWrap(STR$(getWorth(money)) + " gp")
+                            PRINT
                             points = 0
                     END SELECT
                     COLOR colors(15)
-                    IF points <> 0 THEN PRINT USING " (& gp)."; LTRIM$(STR$(points))
+                    IF points <> 0 THEN CALL WordWrap(" (" + LTRIM$(STR$(points)) + " gp).")
                 END IF
                 IF currentMonster.id = basilisk.id AND mirror = 7 THEN
                     835 PRINT "Your mirror killed the "; colored(currentMonster, colors())
@@ -1316,7 +1316,8 @@ DO
                 ELSE
                     280
                     DO
-                        INPUT "Do you wish to (1)fight, (2)run, (3)bribe, OR (4) cast a spell?"; k280
+                        CALL WordWrap(" Do you wish to (1)fight, (2)run, (3)bribe, OR (4) cast a spell")
+                        INPUT k280
                     LOOP UNTIL k280 >= 1 AND k280 <= 4
                     SELECT CASE k280
                         CASE 1
@@ -1662,8 +1663,7 @@ DO
                         SELECT CASE num
                             CASE 1
                                 player.combatStrengthRemaining = 2 * player.combatStrengthRemaining
-                                PRINT "You won an enchanted sword. Your Combat Strength "
-                                PRINT "is doubled and is now"; player.combatStrengthRemaining
+                                CALL WordWrap("You won an enchanted sword. Your Combat Strength is doubled and is now" + STR$(player.combatStrengthRemaining) + ".")
                             CASE 2
                                 PRINT "You won an ordinary sword."
                         END SELECT
@@ -1722,10 +1722,10 @@ DO
                     num = INT(RND(1) * 10)
                     IF num2 = 7 AND mirror <> 7 THEN
                         mirror = 7
-                        PRINT "There was a mirror in the chest. It'll protect you"
-                        PRINT "against any "; colored(basilisk, colors()); "s";
+                        CALL WordWrap("There was a mirror in the chest. It'll protect you against any ")
+                        PRINT colored(basilisk, colors()); "s";
                         COLOR colors(15)
-                        PRINT " you may meet."
+                        CALL WordWrap(" you may meet.")
                         mirror = 7
                         GOTO WHERE_TO
                     END IF
@@ -2167,19 +2167,20 @@ SUB WHERE_IS_IT (castleCoords AS Coordinates, myCoords AS Coordinates):
     ELSE
         PRINT "somewhere to the ";
     END IF
+    s$ = ""
     SELECT CASE num
         CASE IS < 0
-            PRINT "south";
+            s$ = "south"
         CASE IS > 0
-            PRINT "north";
+            s$ = "north"
     END SELECT
     SELECT CASE num2
         CASE IS > 0
-            PRINT "west.";
+            CALL WordWrap(s$ + "west.")
         CASE IS < 0
-            PRINT "east.";
+            CALL WordWrap(s$ + "east.")
         CASE ELSE
-            PRINT ".";
+            CALL WordWrap(s$ + ".")
     END SELECT
     PRINT
 END SUB
@@ -2636,3 +2637,34 @@ FUNCTION getTime$ (t AS DOUBLE) 't is time in seconds
     IF s$ = "" THEN s$ = " 0 seconds"
     getTime$ = s$
 END FUNCTION
+
+SUB WordWrap (text$) 'by Paul Kuliniewicz borg953@aol.com
+    c = 1
+    DO
+        buffer$ = ""
+        DO
+            xbuffer$ = MID$(text$, c, 1)
+            IF LEN(xbuffer$) > 0 THEN z = ASC(xbuffer$) ELSE z = 0
+            IF z >= 32 THEN buffer$ = buffer$ + xbuffer$
+            c = c + 1
+        LOOP UNTIL RIGHT$(buffer$, 1) = " " OR RIGHT$(buffer$, 1) = CHR$(13) OR c = LEN(text$) + 1
+        col = POS(0)
+        IF LEN(buffer$) < 80 - col THEN
+            PRINT buffer$;
+        ELSEIF LEN(buffer$) >= 80 - col AND INSTR(buffer$, "-") <> 0 THEN
+            d = 0
+            DO
+                d = d + 1
+                xxbuffer$ = MID$(buffer$, d, 1)
+                PRINT xxbuffer$;
+            LOOP UNTIL xxbuffer$ = "-"
+            PRINT
+            PRINT RIGHT$(buffer$, LEN(buffer$) - d);
+        ELSE
+            PRINT
+            PRINT buffer$;
+        END IF
+    LOOP UNTIL c = LEN(text$) + 1
+    PRINT ; 'minor change: added a semicolon to allow using this in succession
+END SUB
+
