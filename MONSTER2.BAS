@@ -983,7 +983,7 @@ DO
                         newCoords.x = INT(RND(1) * 100) + 1 'random location
                         newCoords.y = INT(RND(1) * 100) + 1
                     LOOP UNTIL world(newCoords.x, newCoords.y) < 2 'we don't want to land on a wall, inn, or castle
-                    timinforest = timeInForest + travelTime(giantBat.speed, asymptote(player.coords, newCoords))
+                    timeInForest = timeInForest + travelTime(giantBat.speed, asymptote(player.coords, newCoords))
                     player.coords = newCoords
                     GOTO CHECK_MAP
                 END IF
