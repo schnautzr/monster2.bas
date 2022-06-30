@@ -561,7 +561,7 @@ DO
                                 timeInForest = 1
                                 num = num2 - timeInForest
                             END IF
-                            PRINT "You stepped into a time warp and gained"; num; "days."
+                            PRINT "You stepped into a time warp and gained"; num / days; "days."
                             SLEEP 1
                         CASE 4
                             IF player.invisibilityRemaining + player.charmsRemaining + player.sleepRemaining = player.invisibilityMax + player.charmsMax + player.sleepMax THEN EXIT SELECT
