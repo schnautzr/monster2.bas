@@ -247,7 +247,7 @@ DO
             giantEagle = monster(i)
         CASE "giant bat"
             giantBat = monster(i)
-            giantBat.speed = 12
+            giantBat.speed = 60
         CASE "basilisk"
             basilisk = monster(i)
     END SELECT
@@ -362,7 +362,7 @@ player.invisibilityRemaining = rollD(1, 3) - 1
 player.combatStrengthRemaining = rollD(1, 1501) + 499 '10
 player.sleepRemaining = rollD(1, 6) - 1
 player.charmsRemaining = rollD(1, 4) - 1
-player.speed = 6
+player.speed = 30
 PRINT
 INPUT "Do you wish to use the strength and magic from a previous game"; X$
 IF UCASE$(X$) = "Y" THEN
@@ -2047,13 +2047,13 @@ DO
                 PRINT "The innkeeper told you that the forest edge is less than"
                 SELECT CASE num
                     CASE 1
-                        PRINT 2 * (INT(player.coords.y / 10) * 10 + 10); "yards to the north."
+                        PRINT 2 * (INT(player.coords.y / 10) * 30 + 30); "feet to the north."
                     CASE 2
-                        PRINT 2 * (INT((100 - player.coords.y) / 10) * 10 + 10); "yards to the south."
+                        PRINT 2 * (INT((100 - player.coords.y) / 10) * 30 + 30); "feet to the south."
                     CASE 3
-                        PRINT 2 * (INT(player.coords.x / 10) * 10 + 10); "yards to the west."
+                        PRINT 2 * (INT(player.coords.x / 10) * 30 + 30); "feet to the west."
                     CASE 4
-                        PRINT 2 * (INT((100 - player.coords.x) / 10) * 10 + 10); "yards to the east."
+                        PRINT 2 * (INT((100 - player.coords.x) / 10) * 30 + 30); "feet to the east."
                 END SELECT
                 GOTO WHERE_TO
 
@@ -2205,11 +2205,12 @@ SUB LOSS
 END SUB
 
 FUNCTION travelTime# (speed AS SINGLE, distance AS DOUBLE)
-    travelTime = distance / speed
+    travelTime = distance / speed * 6
 END FUNCTION
 
 FUNCTION asymptote# (c1 AS Coordinates, c2 AS Coordinates)
-    asymptote = SQR((c1.x - c2.x) ^ 2 + (c1.y - c2.y) ^ 2)
+
+    asymptote = SQR(FIX(CDBL(30 * (c1.x - c2.x))) ^ 2 + FIX(CDBL(30 * (c1.y - c2.y))) ^ 2)
 END FUNCTION
 
 FUNCTION getSpeed# (player AS Entity)
