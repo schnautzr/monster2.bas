@@ -540,9 +540,9 @@ DO
                 WHAT_HAPPENS_HERE:
                 isChest = 0
                 isSword = 0
-                event = rollD(1, 10) - 1
+                event = rollD(1, 5) - 1
                 IF event = HAVE_RANDOM_EVENT AND tracker <> ENTERING_CASTLE THEN
-                    event = INT(RND(1) * 11 + 1)
+                    event = rollD(1, 12)
                     SELECT CASE event
                         CASE 1
                             PRINT "You stepped into a time warp and lost 7 days."
@@ -1082,8 +1082,8 @@ DO
                     CALL WordWrap("guarding")
                     monster = currentMonster.cr * howManyMonsters * 10
                     recommendedCombatStrength = INT(monster * 2 + getWeightCarried(player) / 100)
+                    event = rollD(1, 14)
                 END IF
-                event = rollD(1, 14)
                 IF (event = 12 OR event = 13 OR event = PRIZE_IS_SPELL) AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
                 IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN CALL WordWrap("Nothing is guarding ")
                 IF event > 11 THEN
