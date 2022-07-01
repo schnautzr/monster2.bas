@@ -1734,6 +1734,7 @@ DO
                         COLOR colors(15)
                         PRINT "!"
                         points = 0
+                        isChest = 0
                         currentMonster = mimic
                         monster = mimic.cr * 10
                         recommendedCombatStrength = INT(mimic.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
@@ -1893,7 +1894,7 @@ DO
                 converted = 0
 
                 DIM charge AS DOUBLE
-                charge = CDBL(INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)) / 100
+                charge = FIX(CDBL(INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)) / 100)
                 IF charge < 5 THEN
                     SELECT CASE (getWorth(player.treasure) + getWorth(player.coins))
                         CASE IS > 5
