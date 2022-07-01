@@ -541,10 +541,9 @@ DO
                 isChest = 0
                 isSword = 0
                 event = rollD(1, 5) - 1
-                '                PRINT "What happens here roll:", event
+                '    PRINT "What happens here roll:", event
                 IF event = HAVE_RANDOM_EVENT AND tracker <> ENTERING_CASTLE THEN
                     event = rollD(1, 12)
-                    '  PRINT "Random event roll:", event
                     SELECT CASE event
                         CASE 1
                             PRINT "You stepped into a time warp and lost 7 days."
@@ -1084,11 +1083,11 @@ DO
                     CALL WordWrap("guarding")
                     monster = currentMonster.cr * howManyMonsters * 10
                     recommendedCombatStrength = INT(monster * 2 + getWeightCarried(player) / 100)
-                    event = rollD(1, 14)
                 END IF
-                'PRINT "Treasure roll:", event
+                event = rollD(1, 14)
+                '                PRINT "Treasure roll:", event
                 IF event > 11 AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
-                IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN CALL WordWrap("Nothing is guarding ")
+                IF (event < 12) AND howManyMonsters = NO_GUARDIAN THEN CALL WordWrap("Nothing is guarding")
                 IF event > 11 THEN
                     IF event <> PRIZE_IS_SPELL THEN
                         IF event > 11 THEN CALL WordWrap(" nothing.")
@@ -1314,7 +1313,7 @@ DO
                     GOTO 500
                 END IF
 
-                IF howManyMonsters = 100 THEN
+                IF howManyMonsters = NO_GUARDIAN THEN
                     PRINT "You get the treasure free!"
                 ELSE
                     280
