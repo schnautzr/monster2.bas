@@ -73,7 +73,7 @@ VERY_RARE = 3
 LEGENDARY = 4
 
 'j value
-NO_GUARDIAN = 100
+NO_GUARDIAN = -1
 
 'num value
 SLEEP_SUCCESS = 3
@@ -541,8 +541,10 @@ DO
                 isChest = 0
                 isSword = 0
                 event = rollD(1, 5) - 1
+                '                PRINT "What happens here roll:", event
                 IF event = HAVE_RANDOM_EVENT AND tracker <> ENTERING_CASTLE THEN
                     event = rollD(1, 12)
+                    '  PRINT "Random event roll:", event
                     SELECT CASE event
                         CASE 1
                             PRINT "You stepped into a time warp and lost 7 days."
@@ -967,6 +969,7 @@ DO
                     GOTO WHERE_TO
                 END IF
                 event = rollD(1, 16)
+                '    PRINT "Guardian roll:", event
                 IF event = GIANT_BAT AND tracker <> ENTERING_CASTLE THEN
                     PRINT "A "; colored(giantBat, colors());
                     COLOR colors(15)
@@ -1016,7 +1019,6 @@ DO
                 END IF
                 IF event = 15 OR event = 16 THEN
                     howManyMonsters = NO_GUARDIAN
-                    GOTO WHAT_HAPPENS_HERE
                 ELSE
                     n = event
                     DO
@@ -1084,7 +1086,8 @@ DO
                     recommendedCombatStrength = INT(monster * 2 + getWeightCarried(player) / 100)
                     event = rollD(1, 14)
                 END IF
-                IF (event = 12 OR event = 13 OR event = PRIZE_IS_SPELL) AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
+                'PRINT "Treasure roll:", event
+                IF event > 11 AND howManyMonsters = NO_GUARDIAN GOTO WHAT_HAPPENS_HERE
                 IF (event = 11) AND howManyMonsters = NO_GUARDIAN THEN CALL WordWrap("Nothing is guarding ")
                 IF event > 11 THEN
                     IF event <> PRIZE_IS_SPELL THEN
