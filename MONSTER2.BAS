@@ -1924,7 +1924,7 @@ DO
                 converted = 0
 
                 DIM charge AS SINGLE
-                charge = FIX(CDBL(INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)) / 100)
+                charge = INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75 / 100)
                 IF charge < 5 THEN
                     SELECT CASE (getWorth(player.treasure) + getWorth(player.coins))
                         CASE IS > 5
@@ -2242,7 +2242,7 @@ END FUNCTION
 
 FUNCTION asymptote# (c1 AS Coordinates, c2 AS Coordinates)
 
-    asymptote = SQR(CDBL(30 * (c1.x - c2.x)) ^ 2 + CDBL(30 * (c1.y - c2.y)) ^ 2)
+    asymptote = SQR((30 * (c1.x - c2.x)) ^ 2 + (30 * (c1.y - c2.y)) ^ 2)
 END FUNCTION
 
 FUNCTION getSpeed# (player AS Entity)
