@@ -7,9 +7,9 @@ Required parameters:
 Optional parameters (not yet supported, but can be entered in the meantime):
 9,10,11,12
 13,14,15,16,17,18
-19,20
-21
+19,20,21
 22
+23
 
 1. The monster's name
 2. The plural form
@@ -21,10 +21,11 @@ Optional parameters (not yet supported, but can be entered in the meantime):
 8. Flag for "ignore invisibility spells". Creatures with truesight, blindsight, or tremorsense can detect the player without visual cues.
 9. Flag for "can't hear"
 10. Flag for "nonmotile"
-11. Flag for "can't go on land"
-12. Flag for "can't go in water"
+11. Flag for "can't be encountered on land"
+12. Flag for "can't be encountered in water"
 13-18: STR/DEX/CON/INT/WIS/CHA
 19: number of hit dice
 20: type of hit dice
-21: Armor Class
-22: Speed divided by 5 (30 ft becomes 6, 60 ft becomes 12)
+21: hit dice modifier
+22: Armor Class
+23: Speed (only used for giant bat)

@@ -92,6 +92,7 @@ END TYPE
 TYPE Dice
     sides AS _BYTE
     ct AS INTEGER
+    modifier AS INTEGER
 END TYPE
 
 
@@ -261,7 +262,7 @@ DO
                 INPUT #file, monster(i).abilities.con, monster(i).abilities.int
                 INPUT #file, monster(i).abilities.wis, monster(i).abilities.cha
             CASE 6
-                INPUT #file, monster(i).hitDice.ct, monster(i).hitDice.sides
+                INPUT #file, monster(i).hitDice.ct, monster(i).hitDice.sides, monster(i).hitDice.modifier
             CASE 7
                 INPUT #file, monster(i).ac
         END SELECT
