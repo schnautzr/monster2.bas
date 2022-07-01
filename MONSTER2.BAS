@@ -126,6 +126,10 @@ TYPE Entity
     disallowSleep AS _BYTE
     disallowCharm AS _BYTE
     disallowInvisibility AS _BYTE
+    cantHear AS _BYTE
+    nonMotile AS _BYTE
+    cantBeEncounteredOnLand AS _BYTE
+    cantBeEncounteredInWater AS _BYTE
     ac AS _BYTE
 
     abilities AS Abilities
@@ -240,6 +244,28 @@ DO
     INPUT #file, monster(i).cr
     INPUT #file, monster(i).color
     INPUT #file, monster(i).disallowBribe, monster(i).disallowSleep, monster(i).disallowCharm, monster(i).disallowInvisibility
+    j = 0
+    WHILE NOT EOF(file)
+        j = j + 1
+        SELECT CASE j
+            CASE 1
+                INPUT #file, monster(i).cantHear
+            CASE 2
+                INPUT #file, monster(i).nonMotile
+            CASE 3
+                INPUT #file, monster(i).cantBeEncounteredOnLand
+            CASE 4
+                INPUT #file, monster(i).cantBeEncounteredInWater
+            CASE 5
+                INPUT #file, monster(i).abilities.str, monster(i).abilities.dex
+                INPUT #file, monster(i).abilities.con, monster(i).abilities.int
+                INPUT #file, monster(i).abilities.wis, monster(i).abilities.cha
+            CASE 6
+                INPUT #file, monster(i).hitDice.ct, monster(i).hitDice.sides
+            CASE 7
+                INPUT #file, monster(i).ac
+        END SELECT
+    WEND
     SELECT CASE monster(i).name
         CASE "mimic"
             mimic = monster(i)
