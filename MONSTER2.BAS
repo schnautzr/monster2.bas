@@ -78,7 +78,7 @@ NO_GUARDIAN = -1
 'num value
 SLEEP_SUCCESS = 3
 
-DIM timeInForest AS DOUBLE
+DIM timeInForest AS SINGLE
 
 TYPE Abilities
     str AS _BYTE
@@ -202,7 +202,7 @@ DATA 10
 DATA 1,10
 monsterCt = 1000
 
-DIM points AS DOUBLE
+DIM points AS SINGLE
 DATA a treasure chest,200,6
 DATA a sword which might be enchanted,25,7
 treasureCt = 2
@@ -1923,7 +1923,7 @@ DO
                 IF converted = 1 THEN PRINT "You converted your coins to lighten your load."
                 converted = 0
 
-                DIM charge AS DOUBLE
+                DIM charge AS SINGLE
                 charge = FIX(CDBL(INT(rollD(1, 100) * RND(1) * (getWorth(player.treasure) + getWorth(player.coins)) * .75)) / 100)
                 IF charge < 5 THEN
                     SELECT CASE (getWorth(player.treasure) + getWorth(player.coins))
@@ -2236,13 +2236,13 @@ SUB LOSS
     END
 END SUB
 
-FUNCTION travelTime# (speed AS SINGLE, distance AS DOUBLE)
+FUNCTION travelTime# (speed AS SINGLE, distance AS SINGLE)
     travelTime = distance / speed * 6
 END FUNCTION
 
 FUNCTION asymptote# (c1 AS Coordinates, c2 AS Coordinates)
 
-    asymptote = SQR(FIX(CDBL(30 * (c1.x - c2.x))) ^ 2 + FIX(CDBL(30 * (c1.y - c2.y))) ^ 2)
+    asymptote = SQR(CDBL(30 * (c1.x - c2.x)) ^ 2 + CDBL(30 * (c1.y - c2.y)) ^ 2)
 END FUNCTION
 
 FUNCTION getSpeed# (player AS Entity)
@@ -2579,7 +2579,7 @@ FUNCTION adjustedXp&& (numberOfMonsters, xPoints AS LONG)
 END FUNCTION
 
 FUNCTION getWorth# (currency AS Currency)
-    getWorth = CDBL(FIX((CDBL(currency.cp) * .01 + CDBL(currency.sp) * .1 + CDBL(currency.ep) * .5 + CDBL(currency.gp) + CDBL(currency.pp) * 10) * 100)) / 100
+    getWorth = currency.cp * .01 + currency.sp * .1 + currency.ep * .5 + currency.gp + currency.pp * 10
 END FUNCTION
 
 FUNCTION getWeightCarried# (entity AS Entity)
@@ -2644,8 +2644,8 @@ FUNCTION DIR$ (spec$) '  Code by Ted Weissgerber
     DIR$ = DirList$(Index%)
 END FUNCTION
 
-FUNCTION getTime$ (t AS DOUBLE) 't is time in seconds
-    DIM s AS DOUBLE, m AS DOUBLE, h AS DOUBLE, d AS DOUBLE
+FUNCTION getTime$ (t AS SINGLE) 't is time in seconds
+    DIM s AS SINGLE, m AS SINGLE, h AS SINGLE, d AS SINGLE
     t = CDBL(INT(t))
     s = CDBL(INT(t) MOD 60)
     m = CDBL(INT(t / 60) MOD 60)
