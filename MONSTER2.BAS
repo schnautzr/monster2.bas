@@ -1599,7 +1599,7 @@ DO
                     PRINT USING "Your Combat Strength is now&."; STR$(player.combatStrengthRemaining)
                 END IF
 
-                500 IF n < 12 THEN
+                500 IF howManyMonsters > NO_GUARDIAN AND n < 12 THEN
                     event = INT(RND(1) * 7)
                     IF event = NOISY_BATTLE THEN
                         DO
