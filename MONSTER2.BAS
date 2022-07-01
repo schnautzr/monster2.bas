@@ -1049,6 +1049,7 @@ DO
                     DO
                         M = rollD(1, monsterCt)
                         currentMonster = monster(M)
+                        IF monster(M).cantBeEncounteredOnLand = 1 THEN _CONTINUE
                         SELECT CASE rollD(1, 4)
                             CASE 1 TO 3
                                 difficulty = EASY
@@ -1631,7 +1632,7 @@ DO
                         DO
                             M = rollD(1, monsterCt)
                             currentMonster = monster(M)
-                        LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
+                        LOOP UNTIL currentMonster.cantHear = 0 AND currentMonster.nonMotile = 0 AND currentMonster.cantBeEncounteredOnLand = 0 AND appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
                         startsWith$ = LEFT$(currentMonster.name, 1)
@@ -1668,7 +1669,7 @@ DO
                         DO
                             M = rollD(1, monsterCt)
                             currentMonster = monster(M)
-                        LOOP UNTIL appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
+                        LOOP UNTIL currentMonster.nonMotile = 0 AND currentMonster.cantBeEncounteredOnLand = 0 AND appropriateChallenge(playerLevel(player.xp), EASY) >= xp(currentMonster.cr, 1)
                         howManyMonsters = 1
                         monster = currentMonster.cr * 10
                         startsWith$ = LEFT$(currentMonster.name, 1)
@@ -1680,7 +1681,7 @@ DO
                         END SELECT
                         PRINT colored(currentMonster, colors());
                         COLOR colors(15)
-                        PRINT " heard the noise of the battle and came wandering by."
+                        PRINT " came wandering by."
                         recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
                         GOTO 945
                     END IF
