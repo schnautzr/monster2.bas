@@ -1653,7 +1653,7 @@ DO
                         PRINT " heard the noise of the battle and came wandering by."
                         recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
 
-                        '945 IF currentMonster.id = basilisk.id AND mirror = 7 GOTO 835
+                        945 ' IF currentMonster.id = basilisk.id AND mirror = 7 GOTO 835
 
                         ENGAGED:
                         DO
