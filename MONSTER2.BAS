@@ -391,7 +391,7 @@ player.sleepRemaining = rollD(1, 6) - 1
 player.charmsRemaining = rollD(1, 4) - 1
 player.speed = 30
 PRINT
-INPUT "Do you wish to use the strength and magic from a previous game"; X$
+INPUT "Use the strength and magic from a previous game"; X$
 IF UCASE$(X$) = "Y" THEN
     DO
         INPUT "COMBAT STRENGTH"; c
@@ -608,7 +608,8 @@ DO
                         CASE 7
                             num = INT(RND(1) * 50 + 1)
                             PRINT "You found"; num;
-                            SELECT CASE rollD(1, 1131)
+                            d1131 = rollD(1, 1131)
+                            SELECT CASE d1131
                                 CASE 1 TO 1000
                                     COLOR colors(6)
                                     PRINT "copper";
@@ -1051,19 +1052,23 @@ DO
                         M = rollD(1, monsterCt)
                         currentMonster = monster(M)
                         IF monster(M).cantBeEncounteredOnLand = 1 THEN _CONTINUE
-                        SELECT CASE rollD(1, 4)
+                        d4 = rollD(1, 4)
+                        SELECT CASE d4
                             CASE 1 TO 3
                                 difficulty = EASY
                             CASE 4
-                                SELECT CASE rollD(1, 4)
+                                d4_2 = rollD(1, 4)
+                                SELECT CASE d4_2
                                     CASE 1 TO 3
                                         difficulty = MEDIUM
                                     CASE 4
-                                        SELECT CASE rollD(1, 4)
+                                        d4_3 = rollD(1, 4)
+                                        SELECT CASE d4_3
                                             CASE 1 TO 3
                                                 difficulty = HARD
                                             CASE 4
-                                                SELECT CASE rollD(1, 4)
+                                                d4_4 = rollD(1, 4)
+                                                SELECT CASE d4_4
                                                     CASE 1 TO 3
                                                         difficulty = DEADLY
                                                     CASE ELSE
@@ -1154,8 +1159,8 @@ DO
                             ignore9and10 = 0
 
                             DO
-                                roll = rollD(1, 8 + 2 * ignore9and10)
-                                SELECT CASE roll
+                                d10 = rollD(1, 8 + 2 * ignore9and10)
+                                SELECT CASE d10
                                     CASE 1
                                         ignore9and10 = 1
                                         IF points < .5 THEN
@@ -1223,8 +1228,8 @@ DO
                             IF getWorth(currentJewelry.value) = 1000 THEN treatAsGemmedSilver = 1
 
                             DO
-                                roll = rollD(1, 10)
-                                SELECT CASE roll
+                                d10 = rollD(1, 10)
+                                SELECT CASE d10
                                     CASE 1
                                         SELECT CASE points
                                             CASE 2000
@@ -1265,9 +1270,10 @@ DO
                         CASE 4
                             money = NO_MONEY
                             FOR i = 1 TO howManyMonsters
+                                d100 = rollD(1, 100)
                                 SELECT CASE currentMonster.cr
                                     CASE 0 TO 4
-                                        SELECT CASE rollD(1, 100)
+                                        SELECT CASE d100
                                             CASE 1 TO 30
                                                 money.cp = money.cp + rollD(5, 6)
                                             CASE 31 TO 60
@@ -1280,7 +1286,7 @@ DO
                                                 money.pp = money.pp + rollD(1, 6)
                                         END SELECT
                                     CASE 5 TO 10
-                                        SELECT CASE rollD(1, 100)
+                                        SELECT CASE d100
                                             CASE 1 TO 30
                                                 money.cp = money.cp + rollD(4, 6) * 100
                                                 money.ep = money.ep + rollD(1, 6) * 35
@@ -1297,7 +1303,7 @@ DO
                                                 money.pp = money.pp + rollD(3, 6)
                                         END SELECT
                                     CASE 11 TO 16
-                                        SELECT CASE rollD(1, 100)
+                                        SELECT CASE d100
                                             CASE 1 TO 20
                                                 money.sp = money.sp + rollD(4, 6) * 100
                                                 money.gp = money.gp + rollD(1, 6) * 100
@@ -1312,7 +1318,7 @@ DO
                                                 money.pp = money.pp + rollD(2, 6) * 10
                                         END SELECT
                                     CASE IS >= 17
-                                        SELECT CASE rollD(1, 100)
+                                        SELECT CASE d100
                                             CASE 1 TO 15
                                                 money.ep = money.ep + rollD(2, 6) * 1000
                                                 money.gp = money.gp + rollD(8, 6) * 100
@@ -1326,7 +1332,7 @@ DO
                                 END SELECT
                             NEXT
                             COLOR colors(14)
-                            CALL WordWrap(STR$(getWorth(money)) + " gp")
+                            CALL WordWrap(STR$(getWorth(money)) + " gp.")
                             PRINT
                             points = 0
                     END SELECT
@@ -1346,8 +1352,8 @@ DO
                 ELSE
                     280
                     DO
-                        CALL WordWrap(" Do you wish to (1)fight, (2)run, (3)bribe, OR (4) cast a spell")
-                        INPUT k280
+                        PRINT
+                        INPUT "[1]fight [2]run [3]bribe [4]cast a spell: ", k280
                     LOOP UNTIL k280 >= 1 AND k280 <= 4
                     SELECT CASE k280
                         CASE 1
@@ -1356,14 +1362,14 @@ DO
                                 COLOR colors(14), colors(6)
                                 PRINT "Recommended Combat Points:"; recommendedCombatStrength + 1
                                 COLOR colors(12), colors(4)
-                                INPUT "How many Combat Points do you wish to use"; k
+                                INPUT "Use how many Combat Points? ", k
                                 COLOR colors(15), colors(0)
                                 SELECT CASE k
                                     CASE IS > player.combatStrengthRemaining
                                         PRINT "You only have"; player.combatStrengthRemaining; "Combat Points."
                                     CASE IS < .5 * recommendedCombatStrength, IS >= player.combatStrengthRemaining - 20, IS > recommendedCombatStrength + 1
                                         COLOR colors(12), colors(4)
-                                        INPUT "Are you sure? Type the number again to confirm."; k2
+                                        INPUT "Are you sure? Enter the number again to confirm. ", k2
                                         COLOR colors(15), colors(0)
                                         IF k = k2 THEN EXIT DO
                                     CASE ELSE
@@ -1429,8 +1435,7 @@ DO
                             OFFER:
                             DO
                                 COLOR colors(10), colors(2)
-                                PRINT "How many gold points do you wish to pay?";
-                                INPUT k
+                                INPUT "Offer (gp): ", k
                                 COLOR colors(15), colors(0)
                                 IF k > getWorth(player.coins) THEN
                                     PRINT "You only have"; getWorth(player.coins); "gp."
@@ -1515,7 +1520,7 @@ DO
                                     GOTO 280
                                 END IF
                                 COLOR colors(13), colors(5)
-                                INPUT "What type of spell-(1)sleep, (2)charm, OR (3)invisibility"; k
+                                INPUT "[1]sleep [2]charm [3]invisibility: ", k
                                 COLOR colors(15), colors(0)
                                 PRINT
 
@@ -1652,7 +1657,7 @@ DO
 
                         ENGAGED:
                         DO
-                            INPUT "Do you wish to (1)fight, (2)run, or (3)cast a spell?"; k
+                            INPUT "[1]fight [2]run [3]cast a spell: ", k
                         LOOP WHILE k < 1 OR k > 3
                         SELECT CASE k
                             CASE 1
@@ -1728,7 +1733,7 @@ DO
                     COLOR colors(15)
                     tracker = 0
                     IF player.sleepMax / 5 + player.charmsMax / 3 + player.invisibilityMax / 2 > 6 THEN
-                        INPUT "Your magic total is rather large. Do you wish to convert it to Combat Points?"; X$
+                        INPUT "Your magic total is rather large. Convert it to Combat Points? ", X$
                         IF UCASE$(X$) = "Y" THEN
                             player.sleepMax = player.sleepMax - 5
                             player.charmsMax = player.charmsMax - 3
@@ -1785,7 +1790,7 @@ DO
         END SELECT
 
         WHERE_TO:
-        INPUT "Which direction? (Press 0 for the map.)"; X$
+        INPUT "Which direction? (0 for the map) ", X$
         IF X$ = "0" THEN
             tracker = CHECKING_MAP
             _CONTINUE
@@ -2105,7 +2110,7 @@ CLS
 
 PRINT "You survived the forest!"
 SLEEP 1
-INPUT "Do you wish to see the number of monsters you killed, ran from, and bribed?"; X$
+INPUT "View the number of monsters you killed, ran from, and bribed"; X$
 
 IF UCASE$(X$) = "N" THEN
     PRINT
@@ -2131,7 +2136,7 @@ IF treasurePointsPrev <> 0 AND treasurePointsPrev > player.treasure.gp THEN
 END IF
 PRINT
 X$ = ""
-IF timeInForest < DAY * 30 THEN INPUT "Do you wish to return to the forest"; X$
+IF timeInForest < DAY * 30 THEN INPUT "Return to the forest"; X$
 timeInForest = 0
 player.sleepRemaining = player.sleepMax
 player.invisibilityRemaining = player.invisibilityMax
@@ -2140,11 +2145,11 @@ player.combatStrengthRemaining = player.maxCombatStrength
 IF UCASE$(X$) <> "Y" THEN
     SLEEP 2
     PRINT
-    INPUT "Do you wish to go to a new forest with the same strength and magic?"; X$
+    INPUT "Go to a new forest with the same strength and magic"; X$
     IF UCASE$(X$) = "Y" THEN GOTO INITIALIZE
-    INPUT "Do you wish to go to a new forest with a new strength and magic?"; X$
+    INPUT "Go to a new forest with a new strength and magic"; X$
     IF UCASE$(X$) = "Y" THEN RUN
-    INPUT "Do you want to see your strength and magic so you can record it?"; X$
+    INPUT "View your strength and magic"; X$
     IF UCASE$(X$) = "Y" THEN
         PRINT "COMBAT STRENGTH-"; player.maxCombatStrength
         PRINT "SLEEP SPELLS-"; player.sleepMax
@@ -2228,7 +2233,7 @@ SUB DEFEATED_BY (monster AS Entity, colors() AS LONG)
 END SUB
 
 SUB LOSS
-    INPUT "You lose everything! Wish to try again?"; X$
+    INPUT "You lose everything! Wish to try again"; X$
     PRINT
     IF UCASE$(X$) = "Y" THEN EXIT SUB
     PRINT
