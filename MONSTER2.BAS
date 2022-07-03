@@ -2578,11 +2578,11 @@ FUNCTION adjustedXp&& (numberOfMonsters, xPoints AS LONG)
     adjustedXp = xPoints * numberOfMonsters * multiplier
 END FUNCTION
 
-FUNCTION getWorth# (currency AS Currency)
+FUNCTION getWorth! (currency AS Currency)
     getWorth = currency.cp * .01 + currency.sp * .1 + currency.ep * .5 + currency.gp + currency.pp * 10
 END FUNCTION
 
-FUNCTION getWeightCarried# (entity AS Entity)
+FUNCTION getWeightCarried! (entity AS Entity)
     getWeightCarried = (entity.coins.cp + entity.coins.sp + entity.coins.ep + entity.coins.gp + entity.coins.pp + entity.treasure.cp + entity.treasure.sp + entity.treasure.ep + entity.treasure.gp + entity.treasure.pp) / 50
 END FUNCTION
 
@@ -2646,11 +2646,11 @@ END FUNCTION
 
 FUNCTION getTime$ (t AS SINGLE) 't is time in seconds
     DIM s AS SINGLE, m AS SINGLE, h AS SINGLE, d AS SINGLE
-    t = CDBL(INT(t))
-    s = CDBL(INT(t) MOD 60)
-    m = CDBL(INT(t / 60) MOD 60)
-    h = CDBL(INT(t / 3600) MOD 24)
-    d = CDBL(INT(t / 86400))
+    t = INT(t)
+    s = INT(t) MOD 60
+    m = INT(t / 60) MOD 60
+    h = INT(t / 3600) MOD 24
+    d = INT(t / 86400)
     s$ = ""
     SELECT EVERYCASE 0
         CASE IS < d
