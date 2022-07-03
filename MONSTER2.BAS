@@ -1100,7 +1100,7 @@ DO
                             CALL WordWrap(" (Challenge Rating" + STR$(currentMonster.cr) + ")")
                             COLOR colors(15)
                             CALL WordWrap(" is ")
-                        CASE IS <> 1
+                        CASE IS > 1
                             currentMonster.name = currentMonster.plural
                             PRINT howManyMonsters;
                             PRINT colored(currentMonster, colors());
