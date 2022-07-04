@@ -223,11 +223,11 @@ i = 0
 DIM monster(1000) AS Entity
 DIM castle(15) AS Castle
 DIM currentMonster AS Entity
-'DIM mimic AS Entity
+DIM mimic AS Entity
 DIM giantEagle AS Entity
 DIM giantBat AS Entity
 DIM pit AS Entity
-'DIM basilisk AS Entity
+DIM basilisk AS Entity
 
 pit.name = "pit"
 pit.color = 6
@@ -268,15 +268,15 @@ DO
         END SELECT
     WEND
     SELECT CASE monster(i).name
-        '        CASE "mimic"
-        '           mimic = monster(i)
+        CASE "mimic"
+            mimic = monster(i)
         CASE "giant eagle"
             giantEagle = monster(i)
         CASE "giant bat"
             giantBat = monster(i)
             giantBat.speed = 60
-            '    CASE "basilisk"
-            '       basilisk = monster(i)
+        CASE "basilisk"
+            basilisk = monster(i)
     END SELECT
 LOOP
 monsterCt = i
@@ -636,11 +636,11 @@ DO
                             PRINT " lying on the";
                             PRINT " ground and picked them up."
                             SLEEP 1
-                            'CASE 8
-                            ' IF mirror <> 7 THEN EXIT SELECT
-                            'PRINT "You tripped over some roots and lost your mirror."
-                            'mirror = 0
-                            'SLEEP 1
+                        CASE 8
+                            IF mirror <> 7 THEN EXIT SELECT
+                            PRINT "You tripped over some roots and lost your mirror."
+                            mirror = 0
+                            SLEEP 1
                         CASE 9
                             PRINT "A hermit told you that there are"; castlesLeft; "castles left."
                             SLEEP 1
@@ -969,12 +969,12 @@ DO
 
                             END SELECT
                             COLOR colors(15)
-                            '  IF num2 = 7 AND mirror <> 7 THEN
-                            '     PRINT "You also found a mirror which will kill any "; colored(basilisk, colors()); "s";
-                            '    COLOR colors(15)
-                            'PRINT " you meet."
-                            'mirror = 7
-                            'END IF
+                            IF num2 = 7 AND mirror <> 7 THEN
+                                PRINT "You also found a mirror which will kill any "; colored(basilisk, colors()); "s";
+                                COLOR colors(15)
+                                PRINT " you meet."
+                                mirror = 7
+                            END IF
                             num2 = INT(RND(1) * 20)
                             IF num2 = 2 THEN
                                 player.combatStrengthRemaining = 2 * player.combatStrengthRemaining
@@ -1339,13 +1339,13 @@ DO
                     COLOR colors(15)
                     IF points <> 0 THEN CALL WordWrap(" (" + LTRIM$(STR$(points)) + " gp).")
                 END IF
-                ''                IF currentMonster.id = basilisk.id AND mirror = 7 THEN
-                '              835 PRINT "Your mirror killed the "; colored(currentMonster, colors())
-                ''             COLOR colors(15)
-                '           numbers(5) = numbers(5) + 1
-                '          monster = 0
-                '         GOTO 500
-                '        END IF
+                IF currentMonster.id = basilisk.id AND mirror = 7 THEN
+                    835 PRINT "Your mirror killed the "; colored(currentMonster, colors())
+                    COLOR colors(15)
+                    numbers(5) = numbers(5) + 1
+                    monster = 0
+                    GOTO 500
+                END IF
 
                 IF howManyMonsters = NO_GUARDIAN THEN
                     PRINT "You get the treasure free!"
@@ -1653,7 +1653,7 @@ DO
                         PRINT " heard the noise of the battle and came wandering by."
                         recommendedCombatStrength = INT(currentMonster.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
 
-                        945 ' IF currentMonster.id = basilisk.id AND mirror = 7 GOTO 835
+                        945 IF currentMonster.id = basilisk.id AND mirror = 7 GOTO 835
 
                         ENGAGED:
                         DO
@@ -1755,27 +1755,27 @@ DO
                 IF isChest = 1 THEN
                     num2 = INT(RND(1) * 10)
                     num = INT(RND(1) * 10)
-                    ''  IF num2 = 7 AND mirror <> 7 THEN
-                    'mirror = 7
-                    'CALL WordWrap("There was a mirror in the chest. It'll protect you against any ")
-                    '   PRINT colored(basilisk, colors()); "s";
-                    ' COLOR colors(15)
-                    'CALL WordWrap(" you may meet.")
-                    'mirror = 7
-                    'GOTO WHERE_TO
-                    'END IF
+                    IF num2 = 7 AND mirror <> 7 THEN
+                        mirror = 7
+                        CALL WordWrap("There was a mirror in the chest. It'll protect you against any ")
+                        PRINT colored(basilisk, colors()); "s";
+                        COLOR colors(15)
+                        CALL WordWrap(" you may meet.")
+                        mirror = 7
+                        GOTO WHERE_TO
+                    END IF
 
-                    '                    IF num = 1 THEN
-                    '830 PRINT "The treasure chest was a "; colored(mimic, colors());
-                    '                   COLOR colors(15)
-                    '                  PRINT "!"
-                    '                 points = 0
-                    '                isChest = 0
-                    'currentMonster = mimic
-                    '               monster = mimic.cr * 10
-                    '              recommendedCombatStrength = INT(mimic.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
-                    '             GOTO ENGAGED
-                    '        END IF
+                    IF num = 1 THEN
+                        830 PRINT "The treasure chest was a "; colored(mimic, colors());
+                        COLOR colors(15)
+                        PRINT "!"
+                        points = 0
+                        isChest = 0
+                        currentMonster = mimic
+                        monster = mimic.cr * 10
+                        recommendedCombatStrength = INT(mimic.cr * 10 * 2 + getWeightCarried(player) / 100) + 1
+                        GOTO ENGAGED
+                    END IF
                 END IF
                 IF getWorth(money) > 0 THEN
                     CALL ADD_CURRENCY(player.coins, money)
@@ -2661,13 +2661,13 @@ FUNCTION getTime$ (t AS SINGLE) 't is time in seconds
     SELECT EVERYCASE 0
         CASE IS < d
             s$ = STR$(d) + " days"
-            IF h + m + s > 0 THEN s$ = s$ + ", "
+            IF h + m + s > 0 THEN s$ = s$ + ","
         CASE IS < h
             s$ = s$ + STR$(h) + " hours"
-            IF m + s > 0 THEN s$ = s$ + ", "
+            IF m + s > 0 THEN s$ = s$ + ","
         CASE IS < m
             IF m > 0 THEN s$ = s$ + STR$(m) + " minutes"
-            IF s > 0 THEN s$ = s$ + ", "
+            IF s > 0 THEN s$ = s$ + ","
         CASE IS < s
             IF s > 0 THEN s$ = s$ + STR$(s) + " seconds"
     END SELECT
